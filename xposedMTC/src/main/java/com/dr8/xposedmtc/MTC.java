@@ -260,17 +260,29 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         myHandler.postDelayed(myRunnable, 10000);
     }
 
-	private void SendStatusBarVol(final Context ctx, String vol, final String app) {
-//	private void SendStatusBarVol(final Context ctx, String vol) {
+	private void SendStatusBarVol(final Context ctx, String vol) {
+        //get foreground app
+        ActivityManager actmgr = (ActivityManager) mCtx.getSystemService(Context.ACTIVITY_SERVICE);
+        RunningTaskInfo foregroundTaskInfo = actmgr.getRunningTasks(1).get(0);
+        String foregroundTaskPackageName = foregroundTaskInfo.topActivity.getPackageName();
+        pmi = mCtx.getPackageManager();
+        PackageInfo foregroundAppPackageInfo;
+        try {
+            foregroundAppPackageInfo = pmi.getPackageInfo(foregroundTaskPackageName, 0);
+            foregroundTaskAppName = foregroundAppPackageInfo.applicationInfo.loadLabel(pmi).toString();
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
 		Intent intent = new Intent("com.microntek.STATUS_BAR_CHANGED");
 		intent.putExtra("pkname", "blah");
 		intent.putExtra("title", vol);
 		ctx.sendBroadcastAsUser(intent, mCurrentUserHandle);
         if (!runnableWaiting) {
-            initHandlers(ctx, app);
+            initHandlers(ctx, foregroundTaskAppName);
         } else {
             myHandler.removeCallbacks(myRunnable);
-            initHandlers(ctx, app);
+            initHandlers(ctx, foregroundTaskAppName);
         }
 	}
 
@@ -287,19 +299,6 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 	}
 
 	private void changeVolume(int i, boolean bool) {
-
-		//get foreground app
-		ActivityManager actmgr = (ActivityManager) mCtx.getSystemService(Context.ACTIVITY_SERVICE);
-		RunningTaskInfo foregroundTaskInfo = actmgr.getRunningTasks(1).get(0);
-		String foregroundTaskPackageName = foregroundTaskInfo.topActivity.getPackageName();
-		pmi = mCtx.getPackageManager();
-		PackageInfo foregroundAppPackageInfo;
-		try {
-			foregroundAppPackageInfo = pmi.getPackageInfo(foregroundTaskPackageName, 0);
-			foregroundTaskAppName = foregroundAppPackageInfo.applicationInfo.loadLabel(pmi).toString();
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		}
 
 		String s;
 		String prefix;
@@ -329,8 +328,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 			break;
 		}
 		am.setParameters(s + mtcGetRealVolume(avvol));
-//		SendStatusBarVol(mCtx, "Vol " + avvol, foregroundTaskAppName);	
-		SendStatusBarVol(mCtx, prefix + avvol, foregroundTaskAppName);
+		SendStatusBarVol(mCtx, prefix + avvol);
 
 	}
 
@@ -373,7 +371,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 						s = "av_volume=";
 						int avvol = android.provider.Settings.System.getInt(mCtx.getContentResolver(), s, 15);
 						am.setParameters(s + mtcGetRealVolume(avvol));
-						SendStatusBarVol(mCtx, "Vol " + avvol, "");
+						SendStatusBarVol(mCtx, "Vol " + avvol);
 						
 						// set initial bt volume
 						String t;
@@ -605,7 +603,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 						String s;
 						s = "av_volume=";
 						int avvol = android.provider.Settings.System.getInt(mCtx.getContentResolver(), s, 15);
-						SendStatusBarVol(mCtx, "Vol " + avvol, "");
+						SendStatusBarVol(mCtx, "Vol " + avvol);
 						return null;
 					}
 				});
