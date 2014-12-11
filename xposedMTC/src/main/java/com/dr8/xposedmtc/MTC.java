@@ -16,11 +16,11 @@ import java.util.Set;
 
 import com.maxmpz.poweramp.player.PowerampAPI;
 
-//import android.app.ActivityManager;
-//import android.app.ActivityManager.RunningTaskInfo;
-//import android.content.pm.PackageInfo;
-//import android.content.pm.PackageManager.NameNotFoundException;
-//import android.os.Handler;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Handler;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -71,6 +71,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 	private static BroadcastReceiver keyReceiver;
 	private static BroadcastReceiver backviewReceiver;
 
+    private boolean runnableWaiting = false;
 	private boolean isPaused;
 	public static boolean DEBUG = false;
 	private static AudioManager am;
@@ -80,6 +81,9 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 	private static String LEARN_INTENT = "com.dr8.xposedmtc.LEARN_PRESETS";
 	private static String SAVE_PRESET = "com.dr8.xposedmtc.SAVE_PRESETS";
 	public static String foregroundTaskAppName = null;
+
+    private Runnable myRunnable;
+    private Handler myHandler = new Handler();
 
 	private SharedPreferences radio_prefs;
 	private android.content.SharedPreferences.Editor editor;
@@ -97,8 +101,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 	}
 
 	public String getAndroidRelease() {
-		String release = Build.VERSION.RELEASE;
-		return release;
+		return Build.VERSION.RELEASE;
 	}
 
 	public static void cmdPlayer(Context ctx, String cmd) {
@@ -228,36 +231,47 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 			e.printStackTrace();
 		}
 	}
-	
-//	private void SendStatusBarVol(final Context ctx, String vol, final String app) {
-	private void SendStatusBarVol(final Context ctx, String vol) {
+
+    private void initHandlers(final Context ctx, final String app) {
+        if (!app.equals("Launcher")) {
+            myRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent1 = new Intent("com.microntek.STATUS_BAR_CHANGED");
+                    intent1.putExtra("pkname", "blah");
+                    intent1.putExtra("title", app);
+                    ctx.sendBroadcastAsUser(intent1, mCurrentUserHandle);
+                    runnableWaiting = false;
+                }
+            };
+        } else {
+            myRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent1 = new Intent("com.microntek.STATUS_BAR_CHANGED");
+                    intent1.putExtra("pkname", "blah");
+                    intent1.putExtra("title", "Home");
+                    ctx.sendBroadcastAsUser(intent1, mCurrentUserHandle);
+                    runnableWaiting = false;
+                }
+            };
+        }
+        runnableWaiting = true;
+        myHandler.postDelayed(myRunnable, 10000);
+    }
+
+	private void SendStatusBarVol(final Context ctx, String vol, final String app) {
+//	private void SendStatusBarVol(final Context ctx, String vol) {
 		Intent intent = new Intent("com.microntek.STATUS_BAR_CHANGED");
 		intent.putExtra("pkname", "blah");
 		intent.putExtra("title", vol);
 		ctx.sendBroadcastAsUser(intent, mCurrentUserHandle);
-
-//		if (!app.equals("Launcher")) {
-//			new Handler().postDelayed(new Runnable() {
-//				@Override
-//				public void run() {
-//					Intent intent1 = new Intent("com.microntek.STATUS_BAR_CHANGED");
-//					intent1.putExtra("pkname", "blah");
-//					intent1.putExtra("title", app);
-//					ctx.sendBroadcastAsUser(intent1, mCurrentUserHandle);       
-//				}
-//			}, 5000);
-//		} else {
-//			new Handler().postDelayed(new Runnable() {
-//				@Override
-//				public void run() {
-//					Intent intent1 = new Intent("com.microntek.STATUS_BAR_CHANGED");
-//					intent1.putExtra("pkname", "blah");
-//					intent1.putExtra("title", "Home");
-//					ctx.sendBroadcastAsUser(intent1, mCurrentUserHandle);       
-//				}
-//			}, 5000);	
-//		}
-		return;	
+        if (!runnableWaiting) {
+            initHandlers(ctx, app);
+        } else {
+            myHandler.removeCallbacks(myRunnable);
+            initHandlers(ctx, app);
+        }
 	}
 
 	private int mtcGetRealVolume(int paramInt)
@@ -274,18 +288,18 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
 	private void changeVolume(int i, boolean bool) {
 
-		// get foreground app
-//		ActivityManager actmgr = (ActivityManager) mCtx.getSystemService(Context.ACTIVITY_SERVICE);
-//		RunningTaskInfo foregroundTaskInfo = actmgr.getRunningTasks(1).get(0);
-//		String foregroundTaskPackageName = foregroundTaskInfo.topActivity.getPackageName();
-//		pmi = mCtx.getPackageManager();
-//		PackageInfo foregroundAppPackageInfo;
-//		try {
-//			foregroundAppPackageInfo = pmi.getPackageInfo(foregroundTaskPackageName, 0);
-//			foregroundTaskAppName = foregroundAppPackageInfo.applicationInfo.loadLabel(pmi).toString();
-//		} catch (NameNotFoundException e) {
-//			e.printStackTrace();
-//		}
+		//get foreground app
+		ActivityManager actmgr = (ActivityManager) mCtx.getSystemService(Context.ACTIVITY_SERVICE);
+		RunningTaskInfo foregroundTaskInfo = actmgr.getRunningTasks(1).get(0);
+		String foregroundTaskPackageName = foregroundTaskInfo.topActivity.getPackageName();
+		pmi = mCtx.getPackageManager();
+		PackageInfo foregroundAppPackageInfo;
+		try {
+			foregroundAppPackageInfo = pmi.getPackageInfo(foregroundTaskPackageName, 0);
+			foregroundTaskAppName = foregroundAppPackageInfo.applicationInfo.loadLabel(pmi).toString();
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
 
 		String s;
 		String prefix;
@@ -316,7 +330,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 		}
 		am.setParameters(s + mtcGetRealVolume(avvol));
 //		SendStatusBarVol(mCtx, "Vol " + avvol, foregroundTaskAppName);	
-		SendStatusBarVol(mCtx, prefix + avvol);	
+		SendStatusBarVol(mCtx, prefix + avvol, foregroundTaskAppName);
 
 	}
 
@@ -359,7 +373,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 						s = "av_volume=";
 						int avvol = android.provider.Settings.System.getInt(mCtx.getContentResolver(), s, 15);
 						am.setParameters(s + mtcGetRealVolume(avvol));
-						SendStatusBarVol(mCtx, "Vol " + avvol);
+						SendStatusBarVol(mCtx, "Vol " + avvol, "");
 						
 						// set initial bt volume
 						String t;
@@ -375,7 +389,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 								String s = intent.getAction();
 								int i = intent.getIntExtra("keyCode", -1);
 								if (s.equals("com.microntek.irkeyDown")) {
-									boolean btLock = (Boolean) getBooleanField(mparam.thisObject, "btLock");
+									boolean btLock = getBooleanField(mparam.thisObject, "btLock");
 									switch (i) {
 									default:
 										return;
@@ -486,7 +500,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 					int j = 0;
 					if (i == 1)
 					{
-						boolean flag = (Boolean) getBooleanField(mparam.thisObject, "gps_isfront");
+						boolean flag = getBooleanField(mparam.thisObject, "gps_isfront");
 
 						j = 0;
 						if (flag)
@@ -542,7 +556,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
 					setIntField(mparam.thisObject, "mtcappmode", 3);
 					pmi = mCtx.getPackageManager();
-					boolean gps_isfront = (boolean) getBooleanField(mparam.thisObject, "gps_isfront");
+					boolean gps_isfront = getBooleanField(mparam.thisObject, "gps_isfront");
 
 					Intent intent = new Intent();
 					String s = (String) mparam.args[0];
@@ -591,7 +605,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 						String s;
 						s = "av_volume=";
 						int avvol = android.provider.Settings.System.getInt(mCtx.getContentResolver(), s, 15);
-						SendStatusBarVol(mCtx, "Vol " + avvol);
+						SendStatusBarVol(mCtx, "Vol " + avvol, "");
 						return null;
 					}
 				});
@@ -609,7 +623,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 						Set<String> modearray = prefs.getStringSet("mode_key", null);
 						//						modearray.add("radio");
 						modearray.add("music");
-						int mtcappmode = (int) getIntField(mparam.thisObject, "mtcappmode");
+						int mtcappmode = getIntField(mparam.thisObject, "mtcappmode");
 						if (DEBUG) log(TAG, "mtcappmode is " + mtcappmode + ", current av_channel is " + s);
 
 						// handle startup condition of mtcappmode = 0
@@ -1224,7 +1238,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 						prefs.reload();
 						editor.clear();
 						editor.commit();
-						int mArea = (int) getIntField(mparam.thisObject, "mArea");
+						int mArea = getIntField(mparam.thisObject, "mArea");
 
 						if (DEBUG) log(TAG, "overwriting default radio presets with local prefs");
 						// fm1 - fm3

@@ -22,6 +22,5 @@ dependencies {
     compile project(':poweramp_api_lib')
     compile project(':xposedLibrary')
     compile 'com.android.support:support-v4:18.0.0'
-    compile files('libs/SunriseSunsetCalc-1.2.jar')
     provided fileTree(dir: 'libs', include: ['*.jar'])
 }

@@ -1,6 +1,7 @@
 # README #
 
 Xposed module for the Huifei/KGL android headunits to change default music player and user-selectable mode switching
+New repository for migrated Android Studio project
 
 ### Install ###
 

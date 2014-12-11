@@ -2,32 +2,32 @@
 <items version="2" >
 
     <item
-        jar="D:\as_workspace\XposedMTC\xposedMTC\libs\SunriseSunsetCalc-1.2.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="3cdab0036d49c88157a637cfbf9a14d9ad7f48c4">
-        <dex dex="D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\pre-dexed\debug\SunriseSunsetCalc-1.2-6a7a22957dc3073b746d935016954031ca03214b.jar" />
-    </item>
-    <item
-        jar="D:\Downloads\android_sdk\sdk\extras\android\m2repository\com\android\support\support-v4\18.0.0\support-v4-18.0.0.jar"
+        jar="/usr/local/android-sdk/sdk/extras/android/m2repository/com/android/support/support-v4/18.0.0/support-v4-18.0.0.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
-        <dex dex="D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\pre-dexed\debug\support-v4-18.0.0-87533b747b3fccc4dbfe55fae2e302ffa81e5a1f.jar" />
+        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/debug/support-v4-18.0.0-77b8fe6b6eeeb64ac5df966d9bc121842655f29d.jar" />
     </item>
     <item
-        jar="D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\exploded-aar\XposedMTC\xposedLibrary\unspecified\classes.jar"
+        jar="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/exploded-aar/xmtc/poweramp_api_lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="c5d1826cfd395b3619c0a26a4389f737ea4519c4">
-        <dex dex="D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\pre-dexed\debug\classes-838ce9b1948641eca72a75651366086be0332acc.jar" />
+        sha1="327872aea448c6cab40cc9f5cafb512fad03ba11">
+        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/debug/classes-70976b75c1097a46ad0101fd3cbf9edd805ffb26.jar" />
     </item>
     <item
-        jar="D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\exploded-aar\XposedMTC\poweramp_api_lib\unspecified\classes.jar"
+        jar="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/exploded-aar/xmtc/xposedLibrary/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="da8f667353f07d4ba2e5f79500ebb815701c4e87">
-        <dex dex="D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\pre-dexed\debug\classes-0ed39046fd76233bf6990c5e10b0a570ceb3ef15.jar" />
+        sha1="83c9bfdec6c7b83c4e6c1c750de651832c7711bb">
+        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/debug/classes-6bfe1bc58ded8ba016f762a182646af0e6423cd3.jar" />
+    </item>
+    <item
+        jar="/home/drait/androidstudio/xmtc/xposedMTC/libs/SunriseSunsetCalc-1.2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="3cdab0036d49c88157a637cfbf9a14d9ad7f48c4">
+        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/debug/SunriseSunsetCalc-1.2-ba78ec76564346d59b57b72ed0af91a6d3b49732.jar" />
     </item>
 
 </items>
