@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="pref_apps_list_default"></string-array>
+    <string-array name="pref_mode_list_default"></string-array>
+    <string-array name="pref_mode_entries">
+        <item>Radio</item>
+        <item>AUX</item>
+        <item>DVD</item>
+        <item>IPod</item>
+        <item>Nav</item>
+        <item>Video</item>
+    </string-array>
+    <string-array name="pref_mode_values">
+        <item>radio</item>
+        <item>aux</item>
+        <item>dvd</item>
+        <item>ipod</item>        
+        <item>nav</item>
+        <item>video</item>
+    </string-array>
+
+</resources>

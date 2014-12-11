@@ -1,0 +1,5 @@
+D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\classes\debug
+D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\pre-dexed\debug\classes-838ce9b1948641eca72a75651366086be0332acc.jar
+D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\pre-dexed\debug\SunriseSunsetCalc-1.2-6a7a22957dc3073b746d935016954031ca03214b.jar
+D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\pre-dexed\debug\classes-0ed39046fd76233bf6990c5e10b0a570ceb3ef15.jar
+D:\as_workspace\XposedMTC\xposedMTC\build\intermediates\pre-dexed\debug\support-v4-18.0.0-87533b747b3fccc4dbfe55fae2e302ffa81e5a1f.jar

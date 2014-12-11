@@ -1,0 +1,3 @@
+include ':xposedLibrary'
+include ':poweramp_api_lib'
+include ':xposedMTC'
