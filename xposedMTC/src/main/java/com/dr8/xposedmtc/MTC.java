@@ -83,7 +83,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 	public static String foregroundTaskAppName = null;
 
     private Runnable myRunnable;
-    private Handler myHandler = new Handler();
+    private Handler myHandler;
 
 	private SharedPreferences radio_prefs;
 	private android.content.SharedPreferences.Editor editor;
@@ -257,7 +257,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             };
         }
         runnableWaiting = true;
-        myHandler.postDelayed(myRunnable, 10000);
+        myHandler.postDelayed(myRunnable, 5000);
     }
 
 	private void SendStatusBarVol(final Context ctx, String vol) {
@@ -278,6 +278,10 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 		intent.putExtra("pkname", "blah");
 		intent.putExtra("title", vol);
 		ctx.sendBroadcastAsUser(intent, mCurrentUserHandle);
+        if (DEBUG) {
+            log(TAG, "sending vol intent with app named " + foregroundTaskAppName);
+            log(TAG, "runnableWaiting is " + runnableWaiting);
+        }
         if (!runnableWaiting) {
             initHandlers(ctx, foregroundTaskAppName);
         } else {
@@ -366,7 +370,8 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 					}
 
 					if (prefs.getBoolean("volswitch", false)) {
-						// set initial volume, change app label to Volume
+                        myHandler = new Handler();
+                        // set initial volume, change app label to Volume
 						String s;
 						s = "av_volume=";
 						int avvol = android.provider.Settings.System.getInt(mCtx.getContentResolver(), s, 15);
