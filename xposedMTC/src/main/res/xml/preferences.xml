@@ -112,7 +112,15 @@
         android:summaryOff="@string/obd_summary_off"
         android:summaryOn="@string/obd_summary_on"
         android:title="@string/obd_title" />
-    
+
+    <EditTextPreference
+        android:defaultValue="OBD"
+        android:dependency="allbtobd"
+        android:dialogTitle="@string/obdstring_title"
+        android:key="obdname"
+        android:summary="@string/obdstring_summary"
+        android:title="@string/obdstring_title" />
+
     <com.dr8.xposedmtc.utils.CustomSwitchPreference
         android:defaultValue="false"
         android:key="debug"

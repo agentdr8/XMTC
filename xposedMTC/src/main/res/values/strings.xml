@@ -51,13 +51,17 @@
     <string name="servicetext">Sunrise/sunset service is running</string>
 	<string name="servicestart">XMTC service started</string>
 	
-	<string name="obd_summary_off">Only BT OBD adapters named OBD will connect</string>
-    <string name="obd_summary_on">Every BT OBD adapter name will be allowed to connect</string>
-    <string name="obd_title">Allow all BT OBD devices</string>
-    
+	<string name="obd_summary_off">Only BT OBD adapter names containing OBD will connect</string>
+    <string name="obd_summary_on">Change OBD device string to match below</string>
+    <string name="obd_title">Override BT OBD devices</string>
+
+    <string name="obdstring_title">OBD Device String</string>
+    <string name="obdstring_summary">Enter full or partial BT OBD device name</string>
+
     <string name="debug_summary_off">Debug output is disabled</string>
     <string name="debug_summary_on">Debug output is written to Xposed error.log</string>
     <string name="debug_title">Debug</string>
-    
-    
+
+
+
 </resources>

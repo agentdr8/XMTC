@@ -6,28 +6,28 @@
         jumboMode="false"
         revision="21.1.2"
         sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
-        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/release/support-v4-18.0.0-77b8fe6b6eeeb64ac5df966d9bc121842655f29d.jar" />
+        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/debug/support-v4-18.0.0-77b8fe6b6eeeb64ac5df966d9bc121842655f29d.jar" />
     </item>
     <item
         jar="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/exploded-aar/xmtc/poweramp_api_lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="99ecba229884dd255dfc28850c1d55a723a38f2f">
-        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/release/classes-70976b75c1097a46ad0101fd3cbf9edd805ffb26.jar" />
-    </item>
-    <item
-        jar="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/exploded-aar/xmtc/xposedLibrary/unspecified/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="3aefdc4113d950ae6a15c2556c6d9103017f0fb7">
-        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/release/classes-6bfe1bc58ded8ba016f762a182646af0e6423cd3.jar" />
+        sha1="5f25bdca79217a5c1efdc6e5fbb59053606ff5f1">
+        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/debug/classes-70976b75c1097a46ad0101fd3cbf9edd805ffb26.jar" />
     </item>
     <item
         jar="/home/drait/androidstudio/xmtc/xposedMTC/libs/SunriseSunsetCalc-1.2.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="3cdab0036d49c88157a637cfbf9a14d9ad7f48c4">
-        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/release/SunriseSunsetCalc-1.2-ba78ec76564346d59b57b72ed0af91a6d3b49732.jar" />
+        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/debug/SunriseSunsetCalc-1.2-ba78ec76564346d59b57b72ed0af91a6d3b49732.jar" />
+    </item>
+    <item
+        jar="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/exploded-aar/xmtc/xposedLibrary/unspecified/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="c6b93a402ef96f72e89ea323b49bd1c3be15b206">
+        <dex dex="/home/drait/androidstudio/xmtc/xposedMTC/build/intermediates/pre-dexed/debug/classes-6bfe1bc58ded8ba016f762a182646af0e6423cd3.jar" />
     </item>
 
 </items>
