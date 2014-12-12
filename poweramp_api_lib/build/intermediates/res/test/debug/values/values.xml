@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- From: file:/D:/as_workspace/XposedMTC/poweramp_api_lib/build/intermediates/bundles/debug/res/values/values.xml -->
-    <eat-comment/>
-    <string name="app_name">Poweramp API Example</string>
-    <string name="unknown">Unknown</string>
-    <string name="unknown_album_name">Unknown album</string>
-    <string name="unknown_artist_name">Unknown artist</string>
-</resources>
