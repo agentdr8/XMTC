@@ -70,7 +70,7 @@
         displayFormat="Dimmed value %d"
         max="255"
         min="0"
-        android:defaultValue="0"
+        android:defaultValue="10"
         android:dependency="dimmerswitch"
         android:key="dimmervalue"
         android:summary="@string/dimm_seek_summary"
