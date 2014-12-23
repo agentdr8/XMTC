@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,9 @@ public class PrefsActivity extends Activity {
 	private Bundle bundle;
 	private static String TAG = "XMTC-Prefs";
 	private static String SAVE_PRESET = "com.dr8.xposedmtc.SAVE_PRESETS";
+
+    private static Runnable myRunnable;
+    private static Handler myHandler;
 
 	@SuppressLint("WorldReadableFiles")
 	@SuppressWarnings("deprecation")
@@ -115,13 +119,23 @@ public class PrefsActivity extends Activity {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			ctx = this.getActivity();
-			
+
+            myRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    getPreferenceManager().setSharedPreferencesMode(MODE_WORLD_READABLE);
+                    addPreferencesFromResource(R.xml.preferences);
+                }
+            };
+
+            myHandler = new Handler();
+
 			AsyncTask<Void, Void, Void> doAppsList = new AsyncTask<Void, Void, Void>() {
 	            @SuppressWarnings("deprecation")
 				@Override
 	            protected Void doInBackground(Void... params) {
-	            	getPreferenceManager().setSharedPreferencesMode(MODE_WORLD_READABLE);
-	    			addPreferencesFromResource(R.xml.preferences);
+                    myHandler.post(myRunnable);
+                    myRunnable.run();
 	                return null;
 	            }
 	            

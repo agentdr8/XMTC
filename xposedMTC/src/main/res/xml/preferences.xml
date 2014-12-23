@@ -116,7 +116,6 @@
     <EditTextPreference
         android:defaultValue="OBD"
         android:dependency="allbtobd"
-        android:dialogTitle="@string/obdstring_title"
         android:key="obdname"
         android:summary="@string/obdstring_summary"
         android:title="@string/obdstring_title" />
