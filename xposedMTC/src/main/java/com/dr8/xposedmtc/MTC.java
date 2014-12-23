@@ -177,12 +177,20 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             callMethod(obj, "setBrightness", value);
             am.setParameters("cfg_backlight=" + value);
             android.provider.Settings.System.putInt(mCtx.getContentResolver(), "screen_brightness", value);
+            if (prefs.getBoolean("screenfilter", false)) {
+                Intent sf = new Intent("com.tonymanou.screenfilter.action.ENABLE");
+                mCtx.sendBroadcast(sf);
+            }
         } else {
             if (DEBUG) log(TAG, "current time is outside our start/end times");
             int nondim = prefs.getInt("nondimmedvalue", 255);
             callMethod(obj, "setBrightness", nondim);
             am.setParameters("cfg_backlight=" + nondim);
             android.provider.Settings.System.putInt(mCtx.getContentResolver(), "screen_brightness", nondim);
+            if (prefs.getBoolean("screenfilter", false)) {
+                Intent sf = new Intent("com.tonymanou.screenfilter.action.DISABLE");
+                mCtx.sendBroadcast(sf);
+            }
         }
     }
 

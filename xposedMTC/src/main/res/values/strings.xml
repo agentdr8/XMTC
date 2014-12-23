@@ -61,7 +61,9 @@
     <string name="debug_summary_off">Debug output is disabled</string>
     <string name="debug_summary_on">Debug output is written to Xposed error.log</string>
     <string name="debug_title">Debug</string>
-
+    <string name="filteroff">Screen Filter will not be enabled during dimming period</string>
+    <string name="filteron">Screen Filter will be enabled during dimming period</string>
+    <string name="filtertitle">Screen Filter Integration</string>
 
 
 </resources>
