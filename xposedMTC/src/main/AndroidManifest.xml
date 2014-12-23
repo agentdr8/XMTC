@@ -80,7 +80,8 @@
             android:enabled="true" 
             android:name=".receivers.AutostartReceiver" 
             android:exported="true">
-            <intent-filter>
+            <intent-filter
+                android:priority="99">
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
