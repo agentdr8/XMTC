@@ -135,4 +135,9 @@
         android:summaryOn="@string/debug_summary_on"
         android:title="@string/debug_title" />
 
+    <Preference
+        android:key="versionpref"
+        android:selectable="false"
+        android:summary="@string/versionsummary">
+    </Preference>
 </PreferenceScreen>
