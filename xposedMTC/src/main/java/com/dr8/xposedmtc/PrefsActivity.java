@@ -10,9 +10,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.View;
@@ -64,7 +67,7 @@ public class PrefsActivity extends Activity {
 			}
 		};
 		this.registerReceiver(prefwriter, preffilter);
-		
+
 		// Display the fragment as the main content.
 		if (savedInstanceState == null)
 			getFragmentManager().beginTransaction().replace(android.R.id.content,
@@ -98,7 +101,16 @@ public class PrefsActivity extends Activity {
 		}
 		super.onBackPressed();
 	}
-	
+
+    public static String getApplicationVersionName(Context context) {
+        PackageManager packageManager = context.getPackageManager();
+        try {
+            PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException ex) {} catch(Exception e){}
+        return "";
+    }
+
 	public void startService(View v) {
 		Intent i = new Intent(this, SunriseService.class);
 		this.startService(i);
@@ -125,6 +137,8 @@ public class PrefsActivity extends Activity {
                 public void run() {
                     getPreferenceManager().setSharedPreferencesMode(MODE_WORLD_READABLE);
                     addPreferencesFromResource(R.xml.preferences);
+                    Preference ver = (Preference) findPreference("versionpref");
+                    ver.setSummary("Version " + getApplicationVersionName(ctx));
                 }
             };
 
@@ -141,13 +155,13 @@ public class PrefsActivity extends Activity {
 	            
 	            @Override
 	            protected void onPostExecute(Void result) {
-	                pd.dismiss();
+                    pd.dismiss();
 	            }
 	        };
 	        
 	        pd = ProgressDialog.show(ctx, getResources().getString(R.string.loading), getResources().getString(R.string.pleasewait), true, false);
 	        doAppsList.execute((Void[])null);
-			
+
 		}
 	}
 	

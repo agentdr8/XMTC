@@ -138,6 +138,6 @@
     <Preference
         android:key="versionpref"
         android:selectable="false"
-        android:summary="@string/versionsummary">
+        android:summary="">
     </Preference>
 </PreferenceScreen>

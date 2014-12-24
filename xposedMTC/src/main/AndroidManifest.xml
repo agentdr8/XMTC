@@ -59,7 +59,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="BackView"
+        <!--<activity android:name="BackView"
             android:label="@string/backview_name" 
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:icon="@drawable/ic_backview">
@@ -67,7 +67,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity>-->
         <receiver 
             android:enabled="true" 
             android:name=".receivers.StatusReceiver" 
