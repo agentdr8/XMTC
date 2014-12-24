@@ -27,3 +27,7 @@ Mods for Huifei/RoadMaster/Klyde/GS/JY android 4.2.2/4.4.2/4.4.4 headunits runni
 * Enable module in Xposed Installer
 * Run module settings and select your media player
 * Reboot
+
+### Discussion ###
+
+Support and discussion can be found at [XDA](http://forum.xda-developers.com/showthread.php?t=2660662)
