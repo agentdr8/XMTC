@@ -1,5 +1,7 @@
 # README #
 
+(New repository for migrated Android Studio project)
+
 Mods for Huifei/RoadMaster/Klyde/GS/JY android 4.2.2/4.4.2/4.4.4 headunits running MTC apps
 
 * Change preferred music app from MTCMusic to something else
@@ -16,8 +18,6 @@ Mods for Huifei/RoadMaster/Klyde/GS/JY android 4.2.2/4.4.2/4.4.4 headunits runni
 * Preference to override the stock volume OSD and place volume level in the statusbar
 * Launcher to manually start the reverse camera view (BackView) -- disabled for now
 * [Screen Filter](http://repo.xposed.info/module/com.tonymanou.screenfilter) integration for ultimate dimming control
-
-New repository for migrated Android Studio project
 
 ### Install ###
 
