@@ -1,4 +1,4 @@
-package com.dr8.xposedmtc;
+package com.dr8.xposedmtc.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

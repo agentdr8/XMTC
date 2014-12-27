@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.dr8.xposedmtc.utils.CustomSwitchPreference
+        android:defaultValue="false"
+        android:key="resetswitch"
+        android:summaryOff="@string/resetoff"
+        android:summaryOn="@string/reseton"
+        android:title="@string/resettitle" />
+
+    <com.dr8.xposedmtc.utils.LearnPresets
+        android:dependency="resetswitch"
+        android:key="learn_presets"
+        android:title="@string/radio_presets" >
+        <intent android:action="com.dr8.xposedmtc.LEARN_PRESETS" />
+    </com.dr8.xposedmtc.utils.LearnPresets>
+
+</PreferenceScreen>

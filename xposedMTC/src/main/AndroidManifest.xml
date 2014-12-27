@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dr8.xposedmtc"
-    android:versionCode="159"
-    android:versionName="1.3.2e" >
+    android:versionCode="160"
+    android:versionName="1.3.2f" >
 
     <uses-sdk
         android:minSdkVersion="17"
@@ -20,14 +20,14 @@
         <meta-data android:value="true" android:name="xposedmodule"/>
         <meta-data android:value="2.0*" android:name="xposedminversion"/>
         <meta-data android:value="Mods for Huifei/Klyde/Roadmaster/HotAudio headunits" android:name="xposeddescription"/>
-        <activity android:name="PrefsActivity" >
+        <activity android:name=".activities.PrefsActivity" >
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
         <activity
-            android:name="Music"
+            android:name=".activities.Music"
             android:noHistory="true"
             android:icon="@drawable/ic_music"
             android:label="@string/music_app_name"
@@ -38,7 +38,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="Radio"
+            android:name=".activities.Radio"
             android:noHistory="true"
             android:icon="@drawable/ic_radio"
             android:label="@string/radio_app_name"
@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="Video"
+            android:name=".activities.Video"
             android:noHistory="true"
             android:icon="@drawable/ic_movie"
             android:label="@string/video_app_name"

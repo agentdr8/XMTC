@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.dr8.xposedmtc.utils.CustomSwitchPreference
+        android:defaultValue="false"
+        android:key="volswitch"
+        android:summaryOff="@string/voloff"
+        android:summaryOn="@string/volon"
+        android:title="@string/voltitle" />
+
+    <com.dr8.xposedmtc.utils.CustomSwitchPreference
+        android:defaultValue="false"
+        android:key="loud"
+        android:summaryOff="@string/loudoff"
+        android:summaryOn="@string/loudon"
+        android:title="@string/loudtitle" />
+
+
+
+    <com.dr8.xposedmtc.utils.CustomSwitchPreference
+        android:defaultValue="false"
+        android:key="debug"
+        android:summaryOff="@string/debug_summary_off"
+        android:summaryOn="@string/debug_summary_on"
+        android:title="@string/debug_title" />
+
+    <Preference
+        android:key="versionpref"
+        android:selectable="false"
+        android:summary="">
+    </Preference>
+
+</PreferenceScreen>

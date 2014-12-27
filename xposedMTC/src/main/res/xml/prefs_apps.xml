@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.dr8.xposedmtc.utils.AppsListPref
+        android:defaultValue="@array/pref_apps_list_default"
+        android:key="apps_key"
+        android:summary="@string/pref_apps_list_summary"
+        android:title="@string/pref_apps_list_title" />
+    <com.dr8.xposedmtc.utils.AppsListPref
+        android:defaultValue="@array/pref_apps_list_default"
+        android:key="video_key"
+        android:summary="@string/pref_vid_list_summary"
+        android:title="@string/pref_vid_list_title" />
+
+    <com.dr8.xposedmtc.utils.CustomSwitchPreference
+        android:defaultValue="false"
+        android:key="modeswitch"
+        android:summaryOff="@string/modeoff"
+        android:summaryOn="@string/modeon"
+        android:title="@string/modetitle" />
+
+    <MultiSelectListPreference
+        android:defaultValue="@array/pref_mode_list_default"
+        android:dependency="modeswitch"
+        android:entries="@array/pref_mode_entries"
+        android:entryValues="@array/pref_mode_values"
+        android:key="mode_key"
+        android:summary="@string/pref_mode_list_summary"
+        android:title="@string/pref_mode_list_title" />
+
+</PreferenceScreen>

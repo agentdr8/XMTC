@@ -1,0 +1,24 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <header
+        android:fragment="com.dr8.xposedmtc.fragments.AppsPrefsFragment"
+        android:title="@string/appsfragtitle" >
+    </header>
+    <header
+        android:fragment="com.dr8.xposedmtc.fragments.DimmerPrefsFragment"
+        android:title="@string/dimmerfragtitle" >
+    </header>
+    <header
+        android:fragment="com.dr8.xposedmtc.fragments.OBDPrefsFragment"
+        android:title="@string/obdfragtitle" >
+    </header>
+    <header
+        android:fragment="com.dr8.xposedmtc.fragments.PresetsPrefsFragment"
+        android:title="@string/presetsfragtitle" >
+    </header>
+    <header
+        android:fragment="com.dr8.xposedmtc.fragments.MiscPrefsFragment"
+        android:title="@string/miscfragtitle" >
+    </header>
+
+</preference-headers>

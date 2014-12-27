@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -21,12 +22,21 @@ public class AppsListPref extends ListPreference {
 	public AppsListPref(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		final PackageManager pm = context.getPackageManager();
-
+        final String[] pk1 = new String[1];
+        final String[] pk2 = new String[1];
 		List<PackageInfo> appListInfo = pm.getInstalledPackages(PackageManager.GET_ACTIVITIES); 
 		Collections.sort(appListInfo, new Comparator<PackageInfo>() {
 			@Override
 			public int compare(PackageInfo o1, PackageInfo o2) {
-				return o1.applicationInfo.loadLabel(pm).toString().compareToIgnoreCase(o2.applicationInfo.loadLabel(pm).toString());
+                try {
+                    pk1[0] = o1.applicationInfo.loadLabel(pm).toString();
+                    pk2[0] = o2.applicationInfo.loadLabel(pm).toString();
+                } catch (Resources.NotFoundException e) {
+                    Log.w(TAG, "No resource found");
+                }
+                return pk1[0].compareToIgnoreCase(pk2[0]);
+
+//                return o1.applicationInfo.loadLabel(pm).toString().compareToIgnoreCase(o2.applicationInfo.loadLabel(pm).toString());
 			}
 		});
 		List<CharSequence> entries = new ArrayList<CharSequence>();
