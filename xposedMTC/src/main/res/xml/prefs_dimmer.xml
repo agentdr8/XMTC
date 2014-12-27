@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.dr8.xposedmtc.utils.CustomSwitchPreference
+        android:defaultValue="false"
+        android:key="dimmerswitch"
+        android:summaryOff="@string/dimmeroff"
+        android:summaryOn="@string/dimmeron"
+        android:title="@string/dimmertitle" />
+
+    <com.dr8.xposedmtc.utils.CustomSwitchPreference
+        android:defaultValue="false"
+        android:dependency="dimmerswitch"
+        android:key="screenfilter"
+        android:summaryOff="@string/filteroff"
+        android:summaryOn="@string/filteron"
+        android:title="@string/filtertitle" />
+
+    <com.dr8.xposedmtc.utils.CustomSwitchPreference
+        android:defaultValue="false"
+        android:dependency="dimmerswitch"
+        android:disableDependentsState="true"
+        android:key="sunriseswitch"
+        android:summaryOff="@string/sunriseoff"
+        android:summaryOn="@string/sunriseon"
+        android:title="@string/sunrisetitle" />
+
+    <Preference
+        android:key="serviceButtons"
+        android:dependency="dimmerswitch"
+        android:layout="@layout/prefbuttons" >
+    </Preference>
+
+    <com.dr8.xposedmtc.utils.TimePreference
+        android:dependency="sunriseswitch"
+        android:key="dimmerstart"
+        android:title="@string/dimmer_start_title" />
+    <com.dr8.xposedmtc.utils.TimePreference
+        android:dependency="sunriseswitch"
+        android:key="dimmerend"
+        android:title="@string/dimmer_end_title" />
+
+    <de.robv.android.xposed.library.ui.ValueSeekBarPreference
+        displayFormat="Dimmed value %d"
+        max="255"
+        min="0"
+        android:defaultValue="10"
+        android:dependency="dimmerswitch"
+        android:key="dimmervalue"
+        android:summary="@string/dimm_seek_summary"
+        android:title="@string/dimm_seek_title" />
+    <de.robv.android.xposed.library.ui.ValueSeekBarPreference
+        displayFormat="Non-dimmed value %d"
+        max="255"
+        min="0"
+        android:defaultValue="255"
+        android:dependency="dimmerswitch"
+        android:key="nondimmedvalue"
+        android:summary="@string/nondimm_seek_summary"
+        android:title="@string/nondimm_seek_title" />
+
+</PreferenceScreen>

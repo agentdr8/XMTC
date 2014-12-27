@@ -4,7 +4,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.dr8.xposedmtc.PrefsActivity;
+import com.dr8.xposedmtc.activities.PrefsActivity;
 import com.dr8.xposedmtc.R;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 

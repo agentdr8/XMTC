@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.dr8.xposedmtc.utils.CustomSwitchPreference
+        android:defaultValue="false"
+        android:key="allbtobd"
+        android:summaryOff="@string/obd_summary_off"
+        android:summaryOn="@string/obd_summary_on"
+        android:title="@string/obd_title" />
+
+    <EditTextPreference
+        android:defaultValue="OBD"
+        android:dependency="allbtobd"
+        android:key="obdname"
+        android:summary="@string/obdstring_summary"
+        android:title="@string/obdstring_title" />
+
+</PreferenceScreen>
