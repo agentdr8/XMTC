@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dr8.xposedmtc"
-    android:versionCode="159"
-    android:versionName="1.3.2e" >
+    android:versionCode="160"
+    android:versionName="1.3.2f" >
 
     <uses-sdk
         android:minSdkVersion="17"
