@@ -64,12 +64,10 @@
     <string name="filteroff">Screen Filter will not be enabled during dimming period</string>
     <string name="filteron">Screen Filter will be enabled during dimming period</string>
     <string name="filtertitle">Screen Filter Integration</string>
-    <string name="versionsummary">Version 1.3.2e</string>
-    <string name="appsfragtitle">App/Modeswitch Overrides</string>
+    <string name="appsfragtitle">App/Modeswitch Settings</string>
     <string name="dimmerfragtitle">Dimmer Settings</string>
     <string name="obdfragtitle">BT OBD Settings</string>
     <string name="presetsfragtitle">Radio Preset Settings</string>
     <string name="miscfragtitle">Misc Settings</string>
-
 
 </resources>
