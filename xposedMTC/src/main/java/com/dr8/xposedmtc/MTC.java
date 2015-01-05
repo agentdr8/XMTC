@@ -36,6 +36,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.UserHandle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.Toast;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
@@ -131,6 +132,40 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             }
             if (DEBUG) log(TAG, "sending playerpro " + cmd + " intent " + intent);
             ctx.sendBroadcast(intent);
+        } else {
+            if (cmd.equals("play")) {
+                Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                i.putExtra(Intent.EXTRA_KEY_EVENT,new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
+                ctx.sendOrderedBroadcast(i, null);
+
+                i = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                i.putExtra(Intent.EXTRA_KEY_EVENT,new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
+                ctx.sendOrderedBroadcast(i, null);
+            } else if (cmd.equals("next")) {
+                Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT));
+                ctx.sendOrderedBroadcast(i, null);
+
+                i = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_NEXT));
+                ctx.sendOrderedBroadcast(i, null);
+            } else if (cmd.equals("prev")) {
+                Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
+                ctx.sendOrderedBroadcast(i, null);
+
+                i = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
+                ctx.sendOrderedBroadcast(i, null);
+            } else if (cmd.equals("stop")) {
+                Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_STOP));
+                ctx.sendOrderedBroadcast(i, null);
+
+                i = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_STOP));
+                ctx.sendOrderedBroadcast(i, null);
+            }
         }
     }
 
@@ -665,6 +700,9 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     am.setParameters("ctl_radio_mute=true");
                                     am.setParameters("av_channel_exit=fm");
                                     am.setParameters("av_channel_enter=sys");
+                                    Intent intent = new Intent("com.microntek.canbusdisplay");
+                                    intent.putExtra("type", "off");
+                                    mCtx.sendBroadcast(intent);
                                     callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
                                     mToast.setText("Music");
                                     mToast.setGravity(17, 0, -100);
@@ -683,6 +721,9 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                             if (modearray.contains("music")) {
                                 am.setParameters("av_channel_exit=dvd");
                                 am.setParameters("av_channel_enter=sys");
+                                Intent intent = new Intent("com.microntek.canbusdisplay");
+                                intent.putExtra("type", "off");
+                                mCtx.sendBroadcast(intent);
                                 callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
                                 mToast.setText("Music");
                                 mToast.setGravity(17, 0, -100);
@@ -734,7 +775,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                 // 3 - music
                             } else if (mtcappmode == 3) {
                                 if (modearray.contains("video")) {
-                                    cmdPlayer(mCtx, "stop");
+                                    cmdPlayer(mCtx, "pause");
                                     callMethod(mparam.thisObject, "startMovie", 1);
                                     mToast.setText("Video");
                                     mToast.setGravity(17, 0, -100);
@@ -743,7 +784,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 4);
                                     return null;
                                 } else if (modearray.contains("ipod")) {
-                                    cmdPlayer(mCtx, "stop");
+                                    cmdPlayer(mCtx, "pause");
                                     am.setParameters("av_channel_exit=sys");
                                     callMethod(mparam.thisObject, "startIpod", 1);
                                     mToast.setText("IPOD");
@@ -753,7 +794,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 5);
                                     return null;
                                 } else if (modearray.contains("aux")) {
-                                    cmdPlayer(mCtx, "stop");
+                                    cmdPlayer(mCtx, "pause");
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=line");
                                     callMethod(mparam.thisObject, "startAux", 1);
@@ -772,7 +813,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 7);
                                     return null;
                                 } else if (modearray.contains("dvd")) {
-                                    cmdPlayer(mCtx, "stop");
+                                    cmdPlayer(mCtx, "pause");
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=dvd");
                                     callMethod(mparam.thisObject, "startDVD", 1);
@@ -783,10 +824,13 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 2);
                                     return null;
                                 } else if (modearray.contains("radio")) {
-                                    cmdPlayer(mCtx, "stop");
+                                    cmdPlayer(mCtx, "pause");
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=fm");
                                     am.setParameters("ctl_radio_mute=false");
+                                    Intent intent = new Intent("com.microntek.canbusdisplay");
+                                    intent.putExtra("type", "off");
+                                    mCtx.sendBroadcast(intent);
                                     callMethod(mparam.thisObject, "startRadio", 1);
                                     mToast.setText("Radio");
                                     mToast.setGravity(17, 0, -100);
