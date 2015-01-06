@@ -29,7 +29,7 @@
         <activity
             android:name=".activities.Music"
             android:noHistory="true"
-            android:icon="@drawable/ic_music"
+            android:icon="@drawable/menu_ico_music"
             android:label="@string/music_app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
             <intent-filter>
@@ -40,7 +40,7 @@
         <activity
             android:name=".activities.Radio"
             android:noHistory="true"
-            android:icon="@drawable/ic_radio"
+            android:icon="@drawable/menu_ico_fm"
             android:label="@string/radio_app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
             <intent-filter>
@@ -51,7 +51,7 @@
         <activity
             android:name=".activities.Video"
             android:noHistory="true"
-            android:icon="@drawable/ic_movie"
+            android:icon="@drawable/menu_ico_video"
             android:label="@string/video_app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
             <intent-filter>
