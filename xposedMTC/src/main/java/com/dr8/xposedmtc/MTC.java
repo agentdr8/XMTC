@@ -74,6 +74,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     private boolean runnableWaiting = false;
     private boolean isPaused;
+    private boolean isPoweramp;
     public static boolean DEBUG = false;
     private static AudioManager am;
     private static PackageManager pmi;
@@ -392,6 +393,8 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     prefs.reload();
                     mCtx = (Context) getObjectField(mparam.thisObject, "mContext");
                     am = (AudioManager) getObjectField(mparam.thisObject, "am");
+
+                    if (prefs.getString("apps_key", "com.microntek.music").equals("com.maxmpz.audioplayer")) isPoweramp = true;
 
                     if (prefs.getBoolean("loud", false)) {
                         callMethod(mparam.thisObject, "LoudSwitch");
@@ -775,7 +778,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                 // 3 - music
                             } else if (mtcappmode == 3) {
                                 if (modearray.contains("video")) {
-                                    cmdPlayer(mCtx, "pause");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }
                                     callMethod(mparam.thisObject, "startMovie", 1);
                                     mToast.setText("Video");
                                     mToast.setGravity(17, 0, -100);
@@ -784,7 +791,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 4);
                                     return null;
                                 } else if (modearray.contains("ipod")) {
-                                    cmdPlayer(mCtx, "pause");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }
                                     am.setParameters("av_channel_exit=sys");
                                     callMethod(mparam.thisObject, "startIpod", 1);
                                     mToast.setText("IPOD");
@@ -794,7 +805,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 5);
                                     return null;
                                 } else if (modearray.contains("aux")) {
-                                    cmdPlayer(mCtx, "pause");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=line");
                                     callMethod(mparam.thisObject, "startAux", 1);
@@ -813,7 +828,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 7);
                                     return null;
                                 } else if (modearray.contains("dvd")) {
-                                    cmdPlayer(mCtx, "pause");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=dvd");
                                     callMethod(mparam.thisObject, "startDVD", 1);
@@ -824,7 +843,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 2);
                                     return null;
                                 } else if (modearray.contains("radio")) {
-                                    cmdPlayer(mCtx, "pause");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=fm");
                                     am.setParameters("ctl_radio_mute=false");
@@ -850,7 +873,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 5);
                                     return null;
                                 } else if (modearray.contains("aux")) {
-                                    cmdPlayer(mCtx, "stop");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=line");
                                     callMethod(mparam.thisObject, "startAux", 1);
@@ -891,7 +918,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                 // 4 - video
                             } else if (mtcappmode == 4) {
                                 if (modearray.contains("aux")) {
-                                    cmdPlayer(mCtx, "stop");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=line");
                                     callMethod(mparam.thisObject, "startAux", 1);
@@ -943,8 +974,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                 // 5 - ipod
                             } else if (mtcappmode == 5) {
                                 if (modearray.contains("aux")) {
-                                    cmdPlayer(mCtx, "stop");
-                                    am.setParameters("av_channel_exit=sys");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }                                    am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=line");
                                     callMethod(mparam.thisObject, "startAux", 1);
                                     mToast.setText("AV IN/AUX");
@@ -1049,7 +1083,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                 // 7 - nav
                             } else if (mtcappmode == 7) {
                                 if (modearray.contains("radio")) {
-                                    cmdPlayer(mCtx, "stop");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=fm");
                                     am.setParameters("ctl_radio_mute=false");
@@ -1096,7 +1134,11 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                     setIntField(mparam.thisObject, "mtcappmode", 5);
                                     return null;
                                 } else if (modearray.contains("aux")) {
-                                    cmdPlayer(mCtx, "stop");
+                                    if (isPoweramp && !isPaused) {
+                                        cmdPlayer(mCtx, "pause");
+                                    } else {
+                                        cmdPlayer(mCtx, "stop");
+                                    }
                                     am.setParameters("av_channel_exit=sys");
                                     am.setParameters("av_channel_enter=line");
                                     callMethod(mparam.thisObject, "startAux", 1);
