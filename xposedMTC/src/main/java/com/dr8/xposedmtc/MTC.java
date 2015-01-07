@@ -202,7 +202,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         endCalendarTime.setTimeInMillis(end);
         endCalendarTime.setLenient(true);
         int endhour = endCalendarTime.get(Calendar.HOUR_OF_DAY);
-        endCalendarTime.roll(Calendar.MINUTE, -1); // subtract a minute, due to intent frequency
+//        endCalendarTime.roll(Calendar.MINUTE, -1); // subtract a minute, due to intent frequency
         int endmin = endCalendarTime.get(Calendar.MINUTE);
         endCalendarTime.set(todayCalendar.get(Calendar.YEAR), todayCalendar.get(Calendar.MONTH), todayCalendar.get(Calendar.DAY_OF_MONTH), endhour, endmin);
 
@@ -486,19 +486,27 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                 am.setParameters("ctl_radio_mute=true");
                                 am.setParameters("av_channel_exit=fm");
                                 am.setParameters("av_channel_enter=sys");
+                                Intent cbintent = new Intent("com.microntek.canbusdisplay");
+                                cbintent.putExtra("type", "off");
+                                mCtx.sendBroadcast(cbintent);
                                 callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
                             } else if (mode.equals("video")) {
                                 mCtx.sendBroadcast(killradio);
                                 am.setParameters("ctl_radio_mute=true");
                                 am.setParameters("av_channel_exit=fm");
                                 am.setParameters("av_channel_enter=sys");
+                                Intent cbintent = new Intent("com.microntek.canbusdisplay");
+                                cbintent.putExtra("type", "off");
+                                mCtx.sendBroadcast(cbintent);
                                 if (DEBUG) log(TAG, "switching to myvideo from radio");
                                 callMethod(mparam.thisObject, "startMovie", 1);
                             } else {
                                 am.setParameters("av_channel_exit=sys");
                                 am.setParameters("av_channel_enter=fm");
                                 am.setParameters("ctl_radio_mute=false");
-                                if (!isPaused) {
+                                if (isPoweramp && !isPaused) {
+                                    cmdPlayer(mCtx, "pause");
+                                } else {
                                     cmdPlayer(mCtx, "stop");
                                 }
                                 if (DEBUG) log(TAG, "switching to radio from mymusic/myvideo");
