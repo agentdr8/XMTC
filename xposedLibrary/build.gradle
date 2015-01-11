@@ -5,6 +5,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
+        targetSdkVersion 15
     }
 
     buildTypes {

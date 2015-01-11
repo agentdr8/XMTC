@@ -92,6 +92,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     private Object mIPowerManager;
     private Method mSetBacklightBrightness;
+    private Method mGoToSleep;
 
     private UserHandle mCurrentUserHandle = (UserHandle) getStaticObjectField(UserHandle.class, "CURRENT");
 
@@ -241,6 +242,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             Method mAsInterface = mIPowerManagerStubClass.getMethod("asInterface", new Class[]{IBinder.class});
             try{
                 mSetBacklightBrightness = mIPowerManagerClass.getMethod("setBacklightBrightness", new Class[]{int.class});
+                mGoToSleep = mIPowerManagerClass.getMethod("goToSleep", new Class[]{long.class});
             }catch(NoSuchMethodException e){
                 mSetBacklightBrightness = mIPowerManagerClass.getMethod("setTemporaryScreenBrightnessSettingOverride", new Class[]{int.class});
             }
@@ -266,6 +268,20 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         try {
             if(mIPowerManager != null && mSetBacklightBrightness != null){
                 mSetBacklightBrightness.invoke(mIPowerManager, brightness);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sleepNow() {
+        try {
+            if(mIPowerManager != null && mGoToSleep != null){
+                mGoToSleep.invoke(mIPowerManager, 0);
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -391,6 +407,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 @Override
                 protected void afterHookedMethod(final MethodHookParam mparam) throws Throwable {
                     prefs.reload();
+
                     mCtx = (Context) getObjectField(mparam.thisObject, "mContext");
                     am = (AudioManager) getObjectField(mparam.thisObject, "am");
 
@@ -534,13 +551,24 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 @Override
                 protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
                     if (mIPowerManager == null) {
-                        makeIPowerManager();
+                        mIPowerManager = makeIPowerManager();
                     }
                     int i = (Integer) mparam.args[0];
                     if (i < 1)
                         i = 1;
                     setBright(i);
                     return true;
+                }
+            });
+
+            findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "powershutdown", new XC_MethodReplacement() {
+                @Override
+                protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
+                    if (mIPowerManager == null) {
+                        mIPowerManager = makeIPowerManager();
+                    }
+                    sleepNow();
+                    return null;
                 }
             });
 
