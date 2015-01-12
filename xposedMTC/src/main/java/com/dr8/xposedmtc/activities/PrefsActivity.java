@@ -57,9 +57,9 @@ public class PrefsActivity extends PreferenceActivity {
                 || PresetsPrefsFragment.class.getName().equals(fragmentName);
     }
 
-	@SuppressLint("WorldReadableFiles")
+
 	@SuppressWarnings("deprecation")
-	@Override
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 		setTitle(R.string.app_name);
 		super.onCreate(savedInstanceState);
@@ -91,13 +91,8 @@ public class PrefsActivity extends PreferenceActivity {
 			}
 		};
 		this.registerReceiver(prefwriter, preffilter);
-
-		// Display the fragment as the main content.
-//		if (savedInstanceState == null)
-//			getFragmentManager().beginTransaction().replace(android.R.id.content,
-//					new PrefsFragment()).commit();
-
 	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -126,15 +121,6 @@ public class PrefsActivity extends PreferenceActivity {
 		super.onBackPressed();
 	}
 
-//    public static String getApplicationVersionName(Context context) {
-//        PackageManager packageManager = context.getPackageManager();
-//        try {
-//            PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
-//            return packageInfo.versionName;
-//        } catch (PackageManager.NameNotFoundException ex) {} catch(Exception e){}
-//        return "";
-//    }
-
 	public void startService(View v) {
 		Intent i = new Intent(this, SunriseService.class);
 		this.startService(i);
@@ -146,47 +132,5 @@ public class PrefsActivity extends PreferenceActivity {
 		this.stopService(i);
 		Log.w(TAG, "SunriseService stopped manually");	
 	}
-	
-//	public static class PrefsFragment extends PreferenceFragment {
-//		private ProgressDialog pd;
-//		private Context ctx;
-//
-//		@Override
-//		public void onCreate(Bundle savedInstanceState) {
-//			super.onCreate(savedInstanceState);
-//			ctx = this.getActivity();
-//
-//            myRunnable = new Runnable() {
-//                @Override
-//                public void run() {
-//                    getPreferenceManager().setSharedPreferencesMode(MODE_WORLD_READABLE);
-//                    addPreferencesFromResource(R.xml.preferences);
-//                    Preference ver = (Preference) findPreference("versionpref");
-//                    ver.setSummary("Version " + getApplicationVersionName(ctx));
-//                }
-//            };
-//
-//            myHandler = new Handler();
-//
-//			AsyncTask<Void, Void, Void> doAppsList = new AsyncTask<Void, Void, Void>() {
-//	            @SuppressWarnings("deprecation")
-//				@Override
-//	            protected Void doInBackground(Void... params) {
-//                    myHandler.post(myRunnable);
-//                    myRunnable.run();
-//	                return null;
-//	            }
-//
-//	            @Override
-//	            protected void onPostExecute(Void result) {
-//                    pd.dismiss();
-//	            }
-//	        };
-//
-//	        pd = ProgressDialog.show(ctx, getResources().getString(R.string.loading), getResources().getString(R.string.pleasewait), true, false);
-//	        doAppsList.execute((Void[])null);
-//
-//		}
-//	}
-	
+
 }

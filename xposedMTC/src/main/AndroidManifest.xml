@@ -1,12 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dr8.xposedmtc"
-    android:versionCode="163"
-    android:versionName="1.3.2i" >
+    android:versionCode="164"
+    android:versionName="1.3.2j" >
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!--<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>-->
+    <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>-->
 
     <application
         android:allowBackup="true"
@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme" >
         
         <meta-data android:value="true" android:name="xposedmodule"/>
-        <meta-data android:value="2.0*" android:name="xposedminversion"/>
+        <meta-data android:value="30+" android:name="xposedminversion"/>
         <meta-data android:value="Mods for Huifei/Klyde/Roadmaster/HotAudio headunits" android:name="xposeddescription"/>
         <activity android:name=".activities.PrefsActivity" >
             <intent-filter>
@@ -82,10 +82,10 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <intent-filter
-                android:priority="100">
-                <action android:name="android.net.wifi.STATE_CHANGE"/>
-            </intent-filter>
+            <!--<intent-filter-->
+                <!--android:priority="100">-->
+                <!--<action android:name="android.net.wifi.STATE_CHANGE"/>-->
+            <!--</intent-filter>-->
         </receiver>
         <receiver 
             android:enabled="true" 

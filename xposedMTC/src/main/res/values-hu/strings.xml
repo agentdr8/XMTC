@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">XposedMTC</string>
+    <string name="music_app_name">Zenéim</string>
+    <string name="video_app_name">Videóim</string>
+    <string name="radio_app_name">Rádióm</string>
+    <string name="backview_name">Tolatókamera</string>
+    <string name="pref_apps_list_summary">Preferált zenelejátszó kiválasztása (az MTCMusic az alapértelemezett)</string>
+    <string name="pref_apps_list_title">Preferált zenelejátszó</string>
+    <string name="pref_vid_list_summary">Preferált videólejátszó kiválasztása (az MTCMovie az alaértelmezett)</string>
+    <string name="pref_vid_list_title">Preferált videólejátszó</string>
+    <string name="pref_mode_list_summary">Források kiválasztása (a zenelejátszó rögzített)</string>
+    <string name="pref_mode_list_title">Mode gomb források</string>
+    <string name="loading">Alkalmazások listájának betöltése</string>
+    <string name="pleasewait">A türelem erény</string>
+    <string name="loudon">Loudness bekapcsolva</string>
+    <string name="loudoff">Loudness kikapcsolva</string>
+    <string name="loudtitle">Loudness induláskor</string>
+    <string name="modeon">Mode gomb felülbírálva</string>
+    <string name="modeoff">Mode gomb alapértelmezett</string>
+    <string name="modetitle">Mode gomb felülbírálása</string>
+    <string name="set">Beállít</string>
+    <string name="cancel">Mégse</string>
+    <string name="dimmer_start_title">Kezdés</string>
+    <string name="dimmer_end_title">Vége</string>
+
+    <string name="dimmeron">Bekapcsolva</string>
+    <string name="dimmeroff">Kikapcsolva</string>
+    <string name="dimmertitle">Sötétítés vezérlő</string>
+
+    <string name="volon">A hangerő változások a futó alkalmazás címének helyén jelenik meg</string>
+    <string name="voloff">Hangerő OSD mutatása</string>
+    <string name="voltitle">Hangerő OSD felülbírálása</string>
+
+    <string name="startbutton">Szolgáltatás indítása</string>
+    <string name="stopbutton">Szolgáltatás leállítása</string>
+
+    <string name="sunriseon">Napkelte/napnyugta GPS pozíció, időzóna, dátum alapján</string>
+    <string name="sunriseoff">Kikapcsolva</string>
+    <string name="sunrisetitle">Indítás/leállítás idejének beállítása automatikusan</string>
+
+    <string name="dimm_seek_summary">Fényerő este</string>
+    <string name="dimm_seek_title">Esti fényerő</string>
+    <string name="nondimm_seek_summary">Fényerő nappal</string>
+    <string name="nondimm_seek_title">Nappali fényerő</string>
+    <string name="radio_presets">Beállított rádió állomások mentése</string>
+    <string name="reseton">A beállított rádió állomások felülírják az alapértelmezetteket</string>
+    <string name="resetoff">Beállított rádió állomások elveszhetnek induláskor</string>
+    <string name="resettitle">Saját, mentett rádió állomások használata</string>
+
+    <string name="servicetext">Napkelte/napnyugta szolgáltatás fut</string>
+    <string name="servicestart">XMTC szolgáltatás elindult</string>
+
+    <string name="obd_summary_off">Csak az OBD nevet tartalmazó BT OBD adapter tud csatlakozni</string>
+    <string name="obd_summary_on">OBD eszköz nevének változtatása az alábbira</string>
+    <string name="obd_title">BT OBD eszközök felülbírálása</string>
+
+    <string name="obdstring_title">OBD eszköz karakterlánc</string>
+    <string name="obdstring_summary">Írd be a BT OBD eszköz teljes nevét, vagy egy részét</string>
+
+    <string name="debug_summary_off">Hibakeresés kimenet kikapcsolva</string>
+    <string name="debug_summary_on">Hibák beírva az Xposed error.log-jába</string>
+    <string name="debug_title">Hibakeresés</string>
+    <string name="filteroff">Screen Filter ki lesz kapcsolva este</string>
+    <string name="filteron">Screen Filter be lesz kapcsolva este</string>
+    <string name="filtertitle">Screen Filter integrálása</string>
+    <string name="appsfragtitle">Alkalmazás/Mode gomb beállításai</string>
+    <string name="dimmerfragtitle">Sötétítés beállításai</string>
+    <string name="obdfragtitle">BT OBD beállításai</string>
+    <string name="presetsfragtitle">Beállított rádió állomások beállításai</string>
+    <string name="miscfragtitle">Egyéb beállítások</string>
+
+</resources>

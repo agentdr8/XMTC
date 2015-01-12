@@ -70,18 +70,19 @@ public class SunriseService extends Service {
 		startForeground(notifID, n);
 	}
 
-	@Override
+	@SuppressWarnings("deprecation")
+    @Override
 	public void onStart(Intent intent, int startid)
 	{
-		prefs = getSharedPreferences("com.dr8.xposedmtc_preferences", MODE_MULTI_PROCESS);
+		prefs = getSharedPreferences("com.dr8.xposedmtc_preferences", MODE_WORLD_READABLE);
 
 		Log.d(TAG, "onStart");
 		LocationManager mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		LocationListener mlocListener = new MyLocationListener();
 		if (prefs.getBoolean("debug", false)) {
-			mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
+			mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 1000, 0, mlocListener);
 		} else {
-			mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 18000000, 80467, mlocListener);	
+			mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 600000, 8047, mlocListener); // 10 minutes, 5 miles
 		}
 
 	}
@@ -133,7 +134,7 @@ public class SunriseService extends Service {
 		endCalendarTime.setTimeInMillis(currentend);
 		endCalendarTime.setLenient(true);
 		int endhour = endCalendarTime.get(Calendar.HOUR_OF_DAY);
-		endCalendarTime.roll(Calendar.MINUTE, -1); // subtract a minute, due to intent frequency
+//		endCalendarTime.roll(Calendar.MINUTE, -1); // subtract a minute, due to intent frequency
 		int endmin = endCalendarTime.get(Calendar.MINUTE);
 		endCalendarTime.set(todayCalendar.get(Calendar.YEAR), todayCalendar.get(Calendar.MONTH), todayCalendar.get(Calendar.DAY_OF_MONTH), endhour, endmin);
 

@@ -567,6 +567,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     if (mIPowerManager == null) {
                         mIPowerManager = makeIPowerManager();
                     }
+                    if (DEBUG) log(TAG, "running sleepNow method");
                     sleepNow();
                     return null;
                 }
@@ -1496,6 +1497,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
         prefs = new XSharedPreferences("com.dr8.xposedmtc", "com.dr8.xposedmtc_preferences");
+        prefs.makeWorldReadable();
         DEBUG = prefs.getBoolean("debug", false);
     }
 
