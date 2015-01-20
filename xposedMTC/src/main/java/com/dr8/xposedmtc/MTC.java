@@ -320,12 +320,12 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         myHandler.postDelayed(myRunnable, 5000);
     }
 
-    private void SendStatusBarVol(final Context ctx, String vol) {
-        //get foreground app
-        ActivityManager actmgr = (ActivityManager) mCtx.getSystemService(Context.ACTIVITY_SERVICE);
+    private String getForegroundApp(Context ctx) {
+        // return foreground app name
+        ActivityManager actmgr = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
         RunningTaskInfo foregroundTaskInfo = actmgr.getRunningTasks(1).get(0);
         String foregroundTaskPackageName = foregroundTaskInfo.topActivity.getPackageName();
-        pmi = mCtx.getPackageManager();
+        pmi = ctx.getPackageManager();
         PackageInfo foregroundAppPackageInfo;
         try {
             foregroundAppPackageInfo = pmi.getPackageInfo(foregroundTaskPackageName, 0);
@@ -333,20 +333,24 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         } catch (NameNotFoundException e) {
             e.printStackTrace();
         }
+        return foregroundTaskAppName;
+    }
 
+    private void SendStatusBarVol(final Context ctx, String vol) {
+        String appname = getForegroundApp(ctx);
         Intent intent = new Intent("com.microntek.STATUS_BAR_CHANGED");
         intent.putExtra("pkname", "blah");
         intent.putExtra("title", vol);
         ctx.sendBroadcastAsUser(intent, mCurrentUserHandle);
         if (DEBUG) {
-            log(TAG, "sending vol intent with app named " + foregroundTaskAppName);
+            log(TAG, "sending vol intent with app named " + appname);
             log(TAG, "runnableWaiting is " + runnableWaiting);
         }
         if (!runnableWaiting) {
-            initHandlers(ctx, foregroundTaskAppName);
+            initHandlers(ctx, appname);
         } else {
             myHandler.removeCallbacks(myRunnable);
-            initHandlers(ctx, foregroundTaskAppName);
+            initHandlers(ctx, appname);
         }
     }
 
