@@ -78,14 +78,11 @@
             android:name=".receivers.AutostartReceiver" 
             android:exported="true">
             <intent-filter
-                android:priority="99">
+                android:priority="100">
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <!--<intent-filter-->
-                <!--android:priority="100">-->
-                <!--<action android:name="android.net.wifi.STATE_CHANGE"/>-->
-            <!--</intent-filter>-->
         </receiver>
         <receiver 
             android:enabled="true" 
