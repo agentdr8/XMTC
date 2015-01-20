@@ -7,6 +7,7 @@ import com.dr8.xposedmtc.fragments.MiscPrefsFragment;
 import com.dr8.xposedmtc.fragments.OBDPrefsFragment;
 import com.dr8.xposedmtc.fragments.PresetsPrefsFragment;
 import com.dr8.xposedmtc.services.SunriseService;
+import com.dr8.xposedmtc.utils.GetLocation;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -65,6 +66,13 @@ public class PrefsActivity extends PreferenceActivity {
 		super.onCreate(savedInstanceState);
 		
 		prefs = getSharedPreferences("com.dr8.xposedmtc_preferences", MODE_WORLD_READABLE);
+
+        if (prefs.getBoolean("firstrun", true)) {
+            GetLocation inst = new GetLocation();
+            long[] times = inst.getLocation(this);
+            prefs.edit().putLong("dimmerstart", times[0]).commit();
+            prefs.edit().putLong("dimmerend", times[1]).commit();
+        }
 
 		IntentFilter preffilter = new IntentFilter();
 		preffilter.addAction(SAVE_PRESET);

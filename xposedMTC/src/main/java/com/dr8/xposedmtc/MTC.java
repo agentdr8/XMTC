@@ -542,8 +542,40 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                             isPaused = intent.getBooleanExtra("paused", false);
                         }
                     };
-
                     mCtx.registerReceiver(statusReceiver, srfilter);
+
+                    mtckeyproc = new BroadcastReceiver() {
+                        public void onReceive(Context context, Intent intent)
+                        {
+                            String s = intent.getAction();
+                            int i = intent.getIntExtra("keyCode", -1);
+                            if (s.equals("com.microntek.irkeyDown"))
+                                switch (i) {
+                                    case 13:
+                                        cmdPlayer(mCtx, "stop");
+                                        return;
+                                    case 14:
+                                    case 24:
+                                    case 46:
+                                    case 62:
+                                        cmdPlayer(mCtx, "next");
+                                        return;
+                                    case 6:
+                                    case 22:
+                                    case 45:
+                                    case 61:
+                                        cmdPlayer(mCtx, "prev");
+                                        return;
+                                    case 3:
+                                        cmdPlayer(mCtx, "play");
+                                        return;
+                                }
+                        }
+                    };
+                    IntentFilter intentfilter = new IntentFilter();
+                    intentfilter.addAction("com.microntek.irkeyDown");
+                    intentfilter.addAction("com.microntek.irkeyUp");
+                    mCtx.registerReceiver(mtckeyproc, intentfilter);
                 }
             });
 
@@ -561,17 +593,17 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 }
             });
 
-            findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "powershutdown", new XC_MethodReplacement() {
-                @Override
-                protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
-                    if (mIPowerManager == null) {
-                        mIPowerManager = makeIPowerManager();
-                    }
-                    if (DEBUG) log(TAG, "running sleepNow method");
-                    sleepNow();
-                    return null;
-                }
-            });
+//            findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "powershutdown", new XC_MethodReplacement() {
+//                @Override
+//                protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
+//                    if (mIPowerManager == null) {
+//                        mIPowerManager = makeIPowerManager();
+//                    }
+//                    if (DEBUG) log(TAG, "running sleepNow method");
+//                    sleepNow();
+//                    return null;
+//                }
+//            });
 
             findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "startMovie", int.class, new XC_MethodReplacement() {
                 @Override
@@ -611,35 +643,6 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
                     prefs.reload();
 
-                    mtckeyproc = new BroadcastReceiver() {
-                        public void onReceive(Context context, Intent intent)
-                        {
-                            String s = intent.getAction();
-                            int i = intent.getIntExtra("keyCode", 0);
-                            if (s.equals("com.microntek.irkeyDown"))
-                                switch (i) {
-                                    case 13:
-                                        cmdPlayer(mCtx, "stop");
-                                        return;
-                                    case 14:
-                                    case 24:
-                                    case 46:
-                                    case 62:
-                                        cmdPlayer(mCtx, "next");
-                                        return;
-                                    case 6:
-                                    case 22:
-                                    case 45:
-                                    case 61:
-                                        cmdPlayer(mCtx, "prev");
-                                        return;
-                                    case 3:
-                                        cmdPlayer(mCtx, "play");
-                                        return;
-                                }
-                        }
-                    };
-
                     setIntField(mparam.thisObject, "mtcappmode", 3);
                     pmi = mCtx.getPackageManager();
                     boolean gps_isfront = getBooleanField(mparam.thisObject, "gps_isfront");
@@ -664,12 +667,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         intent.addFlags(0x30230000);
                         if (intent != null) {
                             if (DEBUG) log(TAG, "intent is " + intent);
-                            mCtx.startActivity(intent);
-
-                            IntentFilter intentfilter = new IntentFilter();
-                            intentfilter.addAction("com.microntek.irkeyDown");
-                            intentfilter.addAction("com.microntek.irkeyUp");
-                            mCtx.registerReceiver(mtckeyproc, intentfilter);
+                                mCtx.startActivity(intent);
                             if (isPaused) {
                                 cmdPlayer(mCtx, "play");
                             }
