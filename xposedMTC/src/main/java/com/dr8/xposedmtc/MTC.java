@@ -34,6 +34,7 @@ import android.media.AudioManager;
 import android.os.Build;
 
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.os.UserHandle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -242,7 +243,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             Method mAsInterface = mIPowerManagerStubClass.getMethod("asInterface", new Class[]{IBinder.class});
             try{
                 mSetBacklightBrightness = mIPowerManagerClass.getMethod("setBacklightBrightness", new Class[]{int.class});
-                mGoToSleep = mIPowerManagerClass.getMethod("goToSleep", new Class[]{long.class});
+                mGoToSleep = mIPowerManagerClass.getMethod("goToSleep", new Class[]{long.class, int.class});
             }catch(NoSuchMethodException e){
                 mSetBacklightBrightness = mIPowerManagerClass.getMethod("setTemporaryScreenBrightnessSettingOverride", new Class[]{int.class});
             }
@@ -281,7 +282,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     private void sleepNow() {
         try {
             if(mIPowerManager != null && mGoToSleep != null){
-                mGoToSleep.invoke(mIPowerManager, 0);
+                mGoToSleep.invoke(mIPowerManager, SystemClock.uptimeMillis(), 0);
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -597,17 +598,17 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 }
             });
 
-//            findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "powershutdown", new XC_MethodReplacement() {
-//                @Override
-//                protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
-//                    if (mIPowerManager == null) {
-//                        mIPowerManager = makeIPowerManager();
-//                    }
-//                    if (DEBUG) log(TAG, "running sleepNow method");
-//                    sleepNow();
-//                    return null;
-//                }
-//            });
+            findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "PowerOffAction", new XC_MethodReplacement() {
+                @Override
+                protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
+                    if (mIPowerManager == null) {
+                        mIPowerManager = makeIPowerManager();
+                    }
+                    if (DEBUG) log(TAG, "running sleepNow method");
+                    sleepNow();
+                    return null;
+                }
+            });
 
             findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "startMovie", int.class, new XC_MethodReplacement() {
                 @Override
