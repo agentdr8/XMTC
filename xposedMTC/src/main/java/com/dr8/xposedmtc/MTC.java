@@ -135,6 +135,23 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             }
             if (DEBUG) log(TAG, "sending playerpro " + cmd + " intent " + intent);
             ctx.sendBroadcast(intent);
+        } else if (prefs.getString("apps_key", "com.microntek.music").equals("com.google.android.music") ||
+                prefs.getString("apps_key", "com.microntek.music").equals("com.spotify.music") ||
+                prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+            Intent i = new Intent("com.android.music.musicservicecommand");
+            if (cmd.equals("pause")) {
+                i.putExtra("command", "pause");
+            } else if (cmd.equals("play")) {
+                i.putExtra("command", "play");
+            } else if (cmd.equals("next")) {
+                i.putExtra("command", "next");
+            } else if (cmd.equals("prev")) {
+                i.putExtra("command", "previous");
+            } else if (cmd.equals("stop")) {
+                i.putExtra("command", "stop");
+            }
+            if (DEBUG) log(TAG, "sending generic musicservicecmd " + cmd + " intent " + i);
+            ctx.sendBroadcast(i);
         } else {
             if (cmd.equals("play")) {
                 Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
