@@ -12,12 +12,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Set;
 
 import com.maxmpz.poweramp.player.PowerampAPI;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ComponentName;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Handler;
@@ -50,16 +52,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     private static XSharedPreferences prefs;
-    private static String targetmtc = "android.microntek.service";
-    private static String TARGET_CLASS = "android.microntek.service.MicrontekServer";
-    private static String radiopkg = "com.microntek.radio";
-    private static String RADIO_CLASS = "com.microntek.radio.RadioService";
-    private static String btpkg = "com.microntek.bluetooth";
-    private static String BT_CLASS = "com.microntek.bluetooth.BTDevice";
-    private static String btuipkg = "com.microntek.bluetooth.ui";
-    private static String BTUI_CLASS = "com.microntek.bluetooth.ui.SearchFragment";
-    private static String settingspkg = "com.android.settings";
-    private static String SETTINGS_CLASS = "com.android.settings.MtcBluetoothSettings";
 
     private static String TAG = "XMTC";
     public static Context mCtx;
@@ -99,7 +91,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     public static void log(String tag, String msg) {
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         String formattedDate = df.format(c.getTime());
         XposedBridge.log("[" + formattedDate + "] " + tag + ": " + msg);
     }
@@ -135,9 +127,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             }
             if (DEBUG) log(TAG, "sending playerpro " + cmd + " intent " + intent);
             ctx.sendBroadcast(intent);
-        } else if (prefs.getString("apps_key", "com.microntek.music").equals("com.google.android.music") ||
-                prefs.getString("apps_key", "com.microntek.music").equals("com.spotify.music") ||
-                prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+        } else if (prefs.getString("apps_key", "com.microntek.music").equals("com.google.android.music")) {
             Intent i = new Intent("com.android.music.musicservicecommand");
             if (cmd.equals("pause")) {
                 i.putExtra("command", "pause");
@@ -156,34 +146,74 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             if (cmd.equals("play")) {
                 Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
                 i.putExtra(Intent.EXTRA_KEY_EVENT,new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
+                if (prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+                    i.setComponent(new ComponentName("com.pandora.android", ""));
+                    ctx.sendBroadcast(i, null);
+                    return;
+                }
                 ctx.sendOrderedBroadcast(i, null);
 
                 i = new Intent(Intent.ACTION_MEDIA_BUTTON);
                 i.putExtra(Intent.EXTRA_KEY_EVENT,new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
+                if (prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+                    i.setComponent(new ComponentName("com.pandora.android", ""));
+                    ctx.sendBroadcast(i, null);
+                    return;
+                }
                 ctx.sendOrderedBroadcast(i, null);
             } else if (cmd.equals("next")) {
                 Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
                 i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT));
+                if (prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+                    i.setComponent(new ComponentName("com.pandora.android", ""));
+                    ctx.sendBroadcast(i, null);
+                    return;
+                }
                 ctx.sendOrderedBroadcast(i, null);
 
                 i = new Intent(Intent.ACTION_MEDIA_BUTTON);
                 i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_NEXT));
+                if (prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+                    i.setComponent(new ComponentName("com.pandora.android", ""));
+                    ctx.sendBroadcast(i, null);
+                    return;
+                }
                 ctx.sendOrderedBroadcast(i, null);
             } else if (cmd.equals("prev")) {
                 Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
                 i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
+                if (prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+                    i.setComponent(new ComponentName("com.pandora.android", ""));
+                    ctx.sendBroadcast(i, null);
+                    return;
+                }
                 ctx.sendOrderedBroadcast(i, null);
 
                 i = new Intent(Intent.ACTION_MEDIA_BUTTON);
                 i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
+                if (prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+                    i.setComponent(new ComponentName("com.pandora.android", ""));
+                    ctx.sendBroadcast(i, null);
+                    return;
+                }
                 ctx.sendOrderedBroadcast(i, null);
             } else if (cmd.equals("stop")) {
                 Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
                 i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_STOP));
+                if (prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+                    i.setComponent(new ComponentName("com.pandora.android", ""));
+                    ctx.sendBroadcast(i, null);
+                    return;
+                }
                 ctx.sendOrderedBroadcast(i, null);
 
                 i = new Intent(Intent.ACTION_MEDIA_BUTTON);
                 i.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_STOP));
+                if (prefs.getString("apps_key", "com.microntek.music").equals("com.pandora.android")) {
+                    i.setComponent(new ComponentName("com.pandora.android", ""));
+                    ctx.sendBroadcast(i, null);
+                    return;
+                }
                 ctx.sendOrderedBroadcast(i, null);
             }
         }
@@ -423,8 +453,14 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         if (mCurrentUserHandle == null)
             mCurrentUserHandle = (UserHandle) getStaticObjectField(UserHandle.class, "CURRENT");
 
+        String targetmtc = "android.microntek.service";
+        String radiopkg = "com.microntek.radio";
+        String btpkg = "com.microntek.bluetooth";
+        String btuipkg = "com.microntek.bluetooth.ui";
+        String settingspkg = "com.android.settings";
         if (lpparam.packageName.equals(targetmtc)) {
 
+            String TARGET_CLASS = "android.microntek.service.MicrontekServer";
             findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "onCreate", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(final MethodHookParam mparam) throws Throwable {
@@ -486,7 +522,6 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                             return;
                                         case 19:
                                             changeVolume(1, btLock);
-                                            return;
                                     }
                                 }
                             }
@@ -590,7 +625,6 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                                         return;
                                     case 3:
                                         cmdPlayer(mCtx, "play");
-                                        return;
                                 }
                         }
                     };
@@ -615,17 +649,17 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 }
             });
 
-            findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "PowerOffAction", new XC_MethodReplacement() {
-                @Override
-                protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
-                    if (mIPowerManager == null) {
-                        mIPowerManager = makeIPowerManager();
-                    }
-                    if (DEBUG) log(TAG, "running sleepNow method");
-                    sleepNow();
-                    return null;
-                }
-            });
+//            findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "PowerOffAction", new XC_MethodReplacement() {
+//                @Override
+//                protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
+//                    if (mIPowerManager == null) {
+//                        mIPowerManager = makeIPowerManager();
+//                    }
+//                    if (DEBUG) log(TAG, "running sleepNow method");
+//                    sleepNow();
+//                    return null;
+//                }
+//            });
 
             findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "startMovie", int.class, new XC_MethodReplacement() {
                 @Override
@@ -635,8 +669,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     int i = (Integer) mparam.args[0];
                     pmi = mCtx.getPackageManager();
 
-                    Intent intent = new Intent();
-                    intent = pmi.getLaunchIntentForPackage(prefs.getString("video_key", "com.microntek.media"));
+                    Intent intent = new Intent(pmi.getLaunchIntentForPackage(prefs.getString("video_key", "com.microntek.media")));
                     int j = 0;
                     if (i == 1)
                     {
@@ -669,10 +702,9 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     pmi = mCtx.getPackageManager();
                     boolean gps_isfront = getBooleanField(mparam.thisObject, "gps_isfront");
 
-                    Intent intent = new Intent();
+                    Intent intent = new Intent(pmi.getLaunchIntentForPackage(prefs.getString("apps_key", "com.microntek.music")));
                     String s = (String) mparam.args[0];
                     int i = (Integer) mparam.args[1];
-                    intent = pmi.getLaunchIntentForPackage(prefs.getString("apps_key", "com.microntek.music"));
                     if (DEBUG) log(TAG, "args caught, string is " + s + " int is " + i);
                     int j;
                     if (s != null)
@@ -687,13 +719,12 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     try
                     {
                         intent.addFlags(0x30230000);
-                        if (intent != null) {
-                            if (DEBUG) log(TAG, "intent is " + intent);
-                                mCtx.startActivity(intent);
-                            if (isPaused) {
-                                cmdPlayer(mCtx, "play");
-                            }
+                        if (DEBUG) log(TAG, "intent is " + intent);
+                        mCtx.startActivity(intent);
+                        if (isPaused) {
+                            cmdPlayer(mCtx, "play");
                         }
+
                     }
                     catch (Exception exception) { }
                     return j;
@@ -1350,6 +1381,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         } else if (lpparam.packageName.equals(radiopkg)) {
             prefs.reload();
             if (prefs.getBoolean("resetswitch", false)) {
+                String RADIO_CLASS = "com.microntek.radio.RadioService";
                 findAndHookMethod(RADIO_CLASS, lpparam.classLoader, "onCreate", new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(final MethodHookParam mparam) throws Throwable {
@@ -1411,22 +1443,17 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         int mBand = 0;
                         int mChannel = 0;
                         int mFreq = prefs.getInt("RadioFrequency0", 87700000);
-                        boolean mSt = true;
-                        boolean mLoc = false;
-                        int mPty = 0;
-                        boolean mAf = true;
-                        boolean mTa = false;
-                        boolean rdsUI = true;
+
                         editor.putInt("RadioBand", mBand);
                         editor.putInt("RadioChannel", mChannel);
                         editor.putInt("CurrentFreq", mFreq);
-                        callMethod(mparam.thisObject, "saveStPreference", mSt);
-                        callMethod(mparam.thisObject, "saveLocPreference", mLoc);
-                        callMethod(mparam.thisObject, "savePtyPreference", mPty);
-                        callMethod(mparam.thisObject, "saveAfPreference", mAf);
-                        callMethod(mparam.thisObject, "saveTaPreference", mTa);
+                        callMethod(mparam.thisObject, "saveStPreference", true);
+                        callMethod(mparam.thisObject, "saveLocPreference", false);
+                        callMethod(mparam.thisObject, "savePtyPreference", 0);
+                        callMethod(mparam.thisObject, "saveAfPreference", true);
+                        callMethod(mparam.thisObject, "saveTaPreference", false);
                         callMethod(mparam.thisObject, "saveAreaPreference", mArea);
-                        callMethod(mparam.thisObject, "saveRdsUIPreference", rdsUI);
+                        callMethod(mparam.thisObject, "saveRdsUIPreference", true);
                         editor.commit();
 
                         return null;
@@ -1437,18 +1464,33 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         } else if (lpparam.packageName.equals(btpkg)) {
             prefs.reload();
             if (prefs.getBoolean("allbtobd", false)) {
-                findAndHookMethod(BT_CLASS, lpparam.classLoader, "isOBDDevice", String.class, new XC_MethodReplacement() {
+                String BT_CLASS = "com.microntek.bluetooth.BTDevice";
+                findAndHookMethod(BT_CLASS, lpparam.classLoader, "isOBDDevice", String.class, new XC_MethodHook() {
                     @Override
-                    protected Object replaceHookedMethod(final MethodHookParam mparam) throws Throwable {
+                    protected void afterHookedMethod(final MethodHookParam mparam) throws Throwable {
                         String paramString = (String) mparam.args[0];
-                        String obdname = prefs.getString("obdname", "OBD");
-                        return (paramString != null) && (paramString.toUpperCase().contains(obdname));
+                        if (paramString.toUpperCase().contains(prefs.getString("obdname", "OBD").toUpperCase())) {
+                            mparam.setResult(true);
+                        } else {
+                            mparam.setResult(false);
+                        }
                     }
                 });
+
+//                findAndHookMethod(BT_CLASS, lpparam.classLoader, "isOBDDevice", String.class, new XC_MethodReplacement() {
+//                    @Override
+//                    protected Object replaceHookedMethod(final MethodHookParam mparam) throws Throwable {
+//                        String paramString = (String) mparam.args[0];
+//                        String obdname = prefs.getString("obdname", "OBD");
+//                        return (paramString != null) && (paramString.toUpperCase().contains(obdname));
+//                    }
+//                });
+
             }
         } else if (lpparam.packageName.equals(settingspkg)) {
             prefs.reload();
             if (prefs.getBoolean("allbtobd", false)) {
+                String SETTINGS_CLASS = "com.android.settings.MtcBluetoothSettings";
                 if (getAndroidRelease().matches("4.2.*")) {
                     findAndHookMethod(SETTINGS_CLASS, lpparam.classLoader, "connecttodevice", String.class, String.class, new XC_MethodReplacement() {
                         @Override
@@ -1485,32 +1527,55 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         }
                     });
                 } else {
-                    findAndHookMethod(SETTINGS_CLASS, lpparam.classLoader, "isOBDDevice", String.class, new XC_MethodReplacement() {
+                    findAndHookMethod(SETTINGS_CLASS, lpparam.classLoader, "isOBDDevice", String.class, new XC_MethodHook() {
                         @Override
-                        protected Object replaceHookedMethod(final MethodHookParam mparam) throws Throwable {
+                        protected void afterHookedMethod(final MethodHookParam mparam) throws Throwable {
                             String paramString = (String) mparam.args[0];
-                            String obdname = prefs.getString("obdname", "OBD");
-                            return (paramString != null) && (paramString.toUpperCase().contains(obdname));
+                            if (paramString.toUpperCase().contains(prefs.getString("obdname", "OBD").toUpperCase())) {
+                                mparam.setResult(true);
+                            } else {
+                                mparam.setResult(false);
+                            }
                         }
                     });
+
+//                    findAndHookMethod(SETTINGS_CLASS, lpparam.classLoader, "isOBDDevice", String.class, new XC_MethodReplacement() {
+//                        @Override
+//                        protected Object replaceHookedMethod(final MethodHookParam mparam) throws Throwable {
+//                            String paramString = (String) mparam.args[0];
+//                            String obdname = prefs.getString("obdname", "OBD");
+//                            return (paramString != null) && (paramString.toUpperCase().contains(obdname));
+//                        }
+//                    });
                 }
             }
         } else if (lpparam.packageName.equals(btuipkg)) {
             prefs.reload();
             if (prefs.getBoolean("allbtobd", false)) {
                 if (getAndroidRelease().matches("4.2.*")) {
-                    findAndHookMethod(BTUI_CLASS, lpparam.classLoader, "isOBDDevice", new XC_MethodReplacement() {
+                    String BTUI_CLASS = "com.microntek.bluetooth.ui.SearchFragment";
+                    findAndHookMethod(BTUI_CLASS, lpparam.classLoader, "isOBDDevice", String.class, new XC_MethodHook() {
                         @Override
-                        protected Object replaceHookedMethod(final MethodHookParam mparam) throws Throwable {
+                        protected void afterHookedMethod(final MethodHookParam mparam) throws Throwable {
                             String paramString = (String) mparam.args[0];
-                            String obdname = prefs.getString("obdname", "OBD");
-                            return (paramString != null) && (paramString.toUpperCase().contains(obdname));
+                            if (paramString.toUpperCase().contains(prefs.getString("obdname", "OBD").toUpperCase())) {
+                                mparam.setResult(true);
+                            } else {
+                                mparam.setResult(false);
+                            }
                         }
                     });
+
+//                    findAndHookMethod(BTUI_CLASS, lpparam.classLoader, "isOBDDevice", new XC_MethodReplacement() {
+//                        @Override
+//                        protected Object replaceHookedMethod(final MethodHookParam mparam) throws Throwable {
+//                            String paramString = (String) mparam.args[0];
+//                            String obdname = prefs.getString("obdname", "OBD");
+//                            return (paramString != null) && (paramString.toUpperCase().contains(obdname));
+//                        }
+//                    });
                 }
             }
-        } else {
-            return;
         }
     }
 

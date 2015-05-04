@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dr8.xposedmtc"
-    android:versionCode="168"
-    android:versionName="1.4.1" >
+    android:versionCode="169"
+    android:versionName="1.4.2" >
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -14,7 +14,7 @@
         
         <meta-data android:value="true" android:name="xposedmodule"/>
         <meta-data android:value="30+" android:name="xposedminversion"/>
-        <meta-data android:value="Mods for Huifei/Klyde/Roadmaster/HotAudio headunits" android:name="xposeddescription"/>
+        <meta-data android:value="Mods for KGL/KLD/RM/JY/GS/MX headunits" android:name="xposeddescription"/>
         <activity android:name=".activities.PrefsActivity" >
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER"/>
