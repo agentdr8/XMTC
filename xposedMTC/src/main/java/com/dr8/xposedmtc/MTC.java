@@ -1502,7 +1502,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                             boolean flag = false;
                             if (s1 != null)
                             {
-                                boolean flag1 = s1.toUpperCase().contains(obdname);
+                                boolean flag1 = s1.toUpperCase().contains(obdname.toUpperCase());
                                 flag = false;
                                 if (flag1)
                                     flag = true;
