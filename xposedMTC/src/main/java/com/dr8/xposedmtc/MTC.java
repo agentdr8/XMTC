@@ -17,6 +17,7 @@ import java.util.Set;
 
 import com.maxmpz.poweramp.player.PowerampAPI;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.content.ComponentName;
@@ -36,7 +37,7 @@ import android.media.AudioManager;
 import android.os.Build;
 
 import android.os.IBinder;
-import android.os.SystemClock;
+//import android.os.SystemClock;
 import android.os.UserHandle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -49,6 +50,7 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
+@SuppressWarnings("ConstantConditions")
 public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     private static XSharedPreferences prefs;
@@ -85,7 +87,6 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     private Object mIPowerManager;
     private Method mSetBacklightBrightness;
-    private Method mGoToSleep;
 
     private UserHandle mCurrentUserHandle = (UserHandle) getStaticObjectField(UserHandle.class, "CURRENT");
 
@@ -286,13 +287,13 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             Class<?> mIPowerManagerClass = Class.forName("android.os.IPowerManager");
             Class<?> mIPowerManagerStubClass = Class.forName("android.os.IPowerManager$Stub");
 
-            Method mGetService = mServiceManagerClass.getMethod("getService", new Class[]{String.class});
-            Method mAsInterface = mIPowerManagerStubClass.getMethod("asInterface", new Class[]{IBinder.class});
+            Method mGetService = mServiceManagerClass.getMethod("getService", String.class);
+            Method mAsInterface = mIPowerManagerStubClass.getMethod("asInterface", IBinder.class);
             try{
-                mSetBacklightBrightness = mIPowerManagerClass.getMethod("setBacklightBrightness", new Class[]{int.class});
-                mGoToSleep = mIPowerManagerClass.getMethod("goToSleep", new Class[]{long.class, int.class});
+                mSetBacklightBrightness = mIPowerManagerClass.getMethod("setBacklightBrightness", int.class);
+//                Method mGoToSleep = mIPowerManagerClass.getMethod("goToSleep", long.class, int.class);
             }catch(NoSuchMethodException e){
-                mSetBacklightBrightness = mIPowerManagerClass.getMethod("setTemporaryScreenBrightnessSettingOverride", new Class[]{int.class});
+                mSetBacklightBrightness = mIPowerManagerClass.getMethod("setTemporaryScreenBrightnessSettingOverride", int.class);
             }
 
             IBinder power = (IBinder) mGetService.invoke(null, "power");
@@ -326,19 +327,19 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         }
     }
 
-    private void sleepNow() {
-        try {
-            if(mIPowerManager != null && mGoToSleep != null){
-                mGoToSleep.invoke(mIPowerManager, SystemClock.uptimeMillis(), 0);
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void sleepNow() {
+//        try {
+//            if(mIPowerManager != null && mGoToSleep != null){
+//                mGoToSleep.invoke(mIPowerManager, SystemClock.uptimeMillis(), 0);
+//            }
+//        } catch (IllegalArgumentException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        } catch (InvocationTargetException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void initHandlers(final Context ctx, final String app) {
         if (!app.equals("Launcher")) {
@@ -687,7 +688,9 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     {
                         mCtx.startActivity(intent);
                     }
-                    catch (Exception exception) { }
+                    catch (Exception exception) {
+                        Log.i(TAG, exception.getMessage());
+                    }
                     setIntField(mparam.thisObject, "mtcappmode", 4);
                     return j;
                 }
@@ -726,7 +729,9 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         }
 
                     }
-                    catch (Exception exception) { }
+                    catch (Exception exception) {
+                        Log.i(TAG, exception.getMessage());
+                    }
                     return j;
                 }
             });
@@ -1383,6 +1388,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             if (prefs.getBoolean("resetswitch", false)) {
                 String RADIO_CLASS = "com.microntek.radio.RadioService";
                 findAndHookMethod(RADIO_CLASS, lpparam.classLoader, "onCreate", new XC_MethodHook() {
+                    @SuppressLint("CommitPrefEdits")
                     @Override
                     protected void afterHookedMethod(final MethodHookParam mparam) throws Throwable {
                         prefs.reload();
@@ -1502,10 +1508,7 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                             boolean flag = false;
                             if (s1 != null)
                             {
-                                boolean flag1 = s1.toUpperCase().contains(obdname.toUpperCase());
-                                flag = false;
-                                if (flag1)
-                                    flag = true;
+                                flag = s1.toUpperCase().contains(obdname.toUpperCase());
                             }
                             Intent intent = new Intent("com.microntek.settingsaccess");
                             intent.putExtra("accesstype", 5);
