@@ -21,7 +21,7 @@ android {
 dependencies {
     compile project(':poweramp_api_lib')
     compile project(':xposedLibrary')
-    compile 'com.android.support:support-v4:21.0.3'
+    compile 'fr.rolandl:carousel:1.0.1@aar'
     compile files('libs/SunriseSunsetCalc-1.2.jar')
     provided fileTree(dir: 'libs', include: ['*.jar'])
 }

@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dr8.xposedmtc"
-    android:versionCode="169"
-    android:versionName="1.4.2" >
+    android:versionCode="170"
+    android:versionName="1.4.3" >
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -16,6 +16,13 @@
         <meta-data android:value="30+" android:name="xposedminversion"/>
         <meta-data android:value="Mods for KGL/KLD/RM/JY/GS/MX headunits" android:name="xposeddescription"/>
         <activity android:name=".activities.PrefsActivity" >
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.SourceSwitcher"
+            android:theme="@style/Theme.Transparent" >
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <action android:name="android.intent.action.MAIN"/>
