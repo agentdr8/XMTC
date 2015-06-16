@@ -1,20 +1,13 @@
 package com.dr8.xposedmtc.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Handler;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.dr8.xposedmtc.R;
-import com.dr8.xposedmtc.activities.PrefsActivity;
 
 public class AppsPrefsFragment extends PreferenceFragment {
 
@@ -27,6 +20,7 @@ public class AppsPrefsFragment extends PreferenceFragment {
         Context ctx = getActivity();
 
         myRunnable = new Runnable() {
+            @SuppressWarnings("deprecation")
             @Override
             public void run() {
                 getPreferenceManager().setSharedPreferencesMode(Context.MODE_WORLD_READABLE);

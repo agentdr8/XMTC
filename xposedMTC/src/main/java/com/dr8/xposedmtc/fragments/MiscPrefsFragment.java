@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 
 import com.dr8.xposedmtc.R;
 
@@ -24,7 +25,7 @@ public class MiscPrefsFragment extends PreferenceFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.prefs_misc);
-        Preference ver = (Preference) findPreference("versionpref");
+        Preference ver = findPreference("versionpref");
         ver.setSummary("Version " + getApplicationVersionName(ctx));
 	}
 
@@ -33,7 +34,9 @@ public class MiscPrefsFragment extends PreferenceFragment {
         try {
             PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
             return packageInfo.versionName;
-        } catch (PackageManager.NameNotFoundException ex) {} catch(Exception e){}
+        } catch (PackageManager.NameNotFoundException ex) {
+            Log.d("XMTC-MiscPrefs", ex.getMessage());
+        }
         return "";
     }
 }
