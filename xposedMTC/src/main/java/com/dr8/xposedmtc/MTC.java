@@ -468,7 +468,9 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     prefs.reload();
 
                     mCtx = (Context) getObjectField(mparam.thisObject, "mContext");
-                    am = (AudioManager) getObjectField(mparam.thisObject, "am");
+//                    am = (AudioManager) getObjectField(mparam.thisObject, "am");
+                    // change for newer MTC Manager
+                    am = ((AudioManager)mCtx.getSystemService(Context.AUDIO_SERVICE));
 
                     if (prefs.getString("apps_key", "com.microntek.music").equals("com.maxmpz.audioplayer")) isPoweramp = true;
 
@@ -753,636 +755,636 @@ public class MTC implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 });
             }
 
-            if (prefs.getBoolean("modeswitch", false)) {
-                findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "ModeSwitch", new XC_MethodReplacement() {
-                    @Override
-                    protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
-                        prefs.reload();
-                        String s = am.getParameters("av_channel=");
-                        String s1 = am.getParameters("cfg_dvd=");
-                        Toast mToast = (Toast) getObjectField(mparam.thisObject, "mToast");
-                        String ipod = am.getParameters("sta_ipod=");
-                        Set<String> modearray = prefs.getStringSet("mode_key", null);
-                        //						modearray.add("radio");
-                        modearray.add("music");
-                        int mtcappmode = getIntField(mparam.thisObject, "mtcappmode");
-                        if (DEBUG) log(TAG, "mtcappmode is " + mtcappmode + ", current av_channel is " + s);
-
-                        // handle startup condition of mtcappmode = 0
-                        if (s.equals("fm") && mtcappmode == 0) {
-                            setIntField(mparam.thisObject, "mtcappmode", 1);
-                            callMethod(mparam.thisObject, "ModeSwitch");
-                        } else if (s.equals("sys") && mtcappmode == 0) {
-                            setIntField(mparam.thisObject, "mtcappmode", 3);
-                            callMethod(mparam.thisObject, "ModeSwitch");
-                        } else if (s.equals("dvd") && mtcappmode == 0) {
-                            setIntField(mparam.thisObject, "mtcappmode", 2);
-                            callMethod(mparam.thisObject, "ModeSwitch");
-                        }
-
-                        // radio output
-                        if (s.equals("fm")) {
-                            if (!s1.equals("0"))
-                            {
-                                if (modearray.contains("dvd")) {
-                                    callMethod(mparam.thisObject, "startDVD", 1);
-                                    mToast.setText("DVD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to dvd from fm");
-                                    setIntField(mparam.thisObject, "mtcappmode", 2);
-                                    return null;
-                                } else if (modearray.contains("music")) {
-                                    am.setParameters("ctl_radio_mute=true");
-                                    am.setParameters("av_channel_exit=fm");
-                                    am.setParameters("av_channel_enter=sys");
-                                    Intent intent = new Intent("com.microntek.canbusdisplay");
-                                    intent.putExtra("type", "off");
-                                    mCtx.sendBroadcast(intent);
-                                    callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
-                                    mToast.setText("Music");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to music from fm");
-                                    setIntField(mparam.thisObject, "mtcappmode", 3);
-                                    return null;
-                                }
-                            }
-                            setIntField(mparam.thisObject, "mtcappmode", 1);
-                            return null;
-                        }
-
-                        // dvd output
-                        if (s.equals("dvd")) {
-                            if (modearray.contains("music")) {
-                                am.setParameters("av_channel_exit=dvd");
-                                am.setParameters("av_channel_enter=sys");
-                                Intent intent = new Intent("com.microntek.canbusdisplay");
-                                intent.putExtra("type", "off");
-                                mCtx.sendBroadcast(intent);
-                                callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
-                                mToast.setText("Music");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to music from dvd");
-                                setIntField(mparam.thisObject, "mtcappmode", 3);
-                                return null;
-                            }
-                        }
-
-                        // android output
-                        if (s.equals("sys")) {
-                            // 1 - radio w/ sys output -- we should never hit here
-                            if (mtcappmode == 1)
-                            {
-                                if (!s1.equals("0")) {
-                                    if (modearray.contains("dvd")) {
-                                        am.setParameters("av_channel_exit=sys");
-                                        callMethod(mparam.thisObject, "startDVD", 1);
-                                        mToast.setText("DVD");
-                                        mToast.setGravity(17, 0, -100);
-                                        mToast.show();
-                                        if (DEBUG) log(TAG, "switch to dvd from sys, mtc1");
-                                        setIntField(mparam.thisObject, "mtcappmode", 2);
-                                        return null;
-                                    } else if (modearray.contains("music")) {
-                                        callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
-                                        mToast.setText("Music");
-                                        mToast.setGravity(17, 0, -100);
-                                        mToast.show();
-                                        if (DEBUG) log(TAG, "switch to music from sys, mtc1");
-                                        setIntField(mparam.thisObject, "mtcappmode", 3);
-                                        return null;
-                                    }
-                                }
-                                setIntField(mparam.thisObject, "mtcappmode", 2);
-                                return null;
-                                // 2 - dvd	-- shouldn't hit here either
-                            } else if (mtcappmode == 2) {
-                                if (modearray.contains("music")) {
-                                    callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
-                                    mToast.setText("Music");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to music from sys, mtc2");
-                                }
-                                setIntField(mparam.thisObject, "mtcappmode", 3);
-                                return null;
-                                // 3 - music
-                            } else if (mtcappmode == 3) {
-                                if (modearray.contains("video")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }
-                                    callMethod(mparam.thisObject, "startMovie", 1);
-                                    mToast.setText("Video");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to video from sys, mtc3");
-                                    setIntField(mparam.thisObject, "mtcappmode", 4);
-                                    return null;
-                                } else if (modearray.contains("ipod")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }
-                                    am.setParameters("av_channel_exit=sys");
-                                    callMethod(mparam.thisObject, "startIpod", 1);
-                                    mToast.setText("IPOD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to ipod from sys, mtc3");
-                                    setIntField(mparam.thisObject, "mtcappmode", 5);
-                                    return null;
-                                } else if (modearray.contains("aux")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=line");
-                                    callMethod(mparam.thisObject, "startAux", 1);
-                                    mToast.setText("AV IN/AUX");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc3");
-                                    setIntField(mparam.thisObject, "mtcappmode", 6);
-                                    return null;
-                                } else if (modearray.contains("nav")) {
-                                    callMethod(mparam.thisObject, "startGPS");
-                                    mToast.setText("Nav");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc3");
-                                    setIntField(mparam.thisObject, "mtcappmode", 7);
-                                    return null;
-                                } else if (modearray.contains("dvd")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=dvd");
-                                    callMethod(mparam.thisObject, "startDVD", 1);
-                                    mToast.setText("DVD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc3");
-                                    setIntField(mparam.thisObject, "mtcappmode", 2);
-                                    return null;
-                                } else if (modearray.contains("radio")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=fm");
-                                    am.setParameters("ctl_radio_mute=false");
-                                    Intent intent = new Intent("com.microntek.canbusdisplay");
-                                    intent.putExtra("type", "off");
-                                    mCtx.sendBroadcast(intent);
-                                    callMethod(mparam.thisObject, "startRadio", 1);
-                                    mToast.setText("Radio");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc3");
-                                    setIntField(mparam.thisObject, "mtcappmode", 1);
-                                    return null;
-                                }
-                                // 4 - ipod
-                            } else if (ipod.equals("true") && mtcappmode == 4) {
-                                if (modearray.contains("ipod")) {
-                                    callMethod(mparam.thisObject, "startIpod", 1);
-                                    mToast.setText("IPOD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to ipod from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 5);
-                                    return null;
-                                } else if (modearray.contains("aux")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=line");
-                                    callMethod(mparam.thisObject, "startAux", 1);
-                                    mToast.setText("AV IN/AUX");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 6);
-                                    return null;
-                                } else if (modearray.contains("nav")) {
-                                    callMethod(mparam.thisObject, "startGPS");
-                                    mToast.setText("Nav");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 7);
-                                    return null;
-                                } else if (modearray.contains("radio")) {
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=fm");
-                                    am.setParameters("ctl_radio_mute=false");
-                                    callMethod(mparam.thisObject, "startRadio", 1);
-                                    mToast.setText("Radio");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 1);
-                                    return null;
-                                } else if (modearray.contains("music")) {
-                                    callMethod(mparam.thisObject, "startMusic", 1);
-                                    mToast.setText("Music");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to music from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 3);
-                                    return null;
-                                }
-                                // 4 - video
-                            } else if (mtcappmode == 4) {
-                                if (modearray.contains("aux")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=line");
-                                    callMethod(mparam.thisObject, "startAux", 1);
-                                    mToast.setText("AV IN/AUX");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 6);
-                                    return null;
-                                } else if (modearray.contains("nav")) {
-                                    callMethod(mparam.thisObject, "startGPS");
-                                    mToast.setText("Nav");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 7);
-                                    return null;
-                                } else if (modearray.contains("radio")) {
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=fm");
-                                    am.setParameters("ctl_radio_mute=false");
-                                    callMethod(mparam.thisObject, "startRadio", 1);
-                                    mToast.setText("Radio");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 1);
-                                    return null;
-                                } else if (modearray.contains("dvd")) {
-                                    am.setParameters("av_channel_exit=sys");
-                                    callMethod(mparam.thisObject, "startDVD", 1);
-                                    mToast.setText("DVD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 2);
-                                    return null;
-                                } else if (modearray.contains("music")) {
-                                    callMethod(mparam.thisObject, "startMusic", 1);
-                                    mToast.setText("Music");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to music from sys, mtc4");
-                                    setIntField(mparam.thisObject, "mtcappmode", 3);
-                                    return null;
-                                }
-                                setIntField(mparam.thisObject, "mtcappmode", 5);
-                                return null;
-                                // 5 - ipod
-                            } else if (mtcappmode == 5) {
-                                if (modearray.contains("aux")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=line");
-                                    callMethod(mparam.thisObject, "startAux", 1);
-                                    mToast.setText("AV IN/AUX");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc5");
-                                    setIntField(mparam.thisObject, "mtcappmode", 6);
-                                    return null;
-                                } else if (modearray.contains("nav")) {
-                                    callMethod(mparam.thisObject, "startGPS");
-                                    mToast.setText("Nav");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc5");
-                                    setIntField(mparam.thisObject, "mtcappmode", 7);
-                                    return null;
-                                } else if (modearray.contains("radio")) {
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=fm");
-                                    am.setParameters("ctl_radio_mute=false");
-                                    callMethod(mparam.thisObject, "startRadio", 1);
-                                    mToast.setText("Radio");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc5");
-                                    setIntField(mparam.thisObject, "mtcappmode", 1);
-                                    return null;
-                                } else if (modearray.contains("dvd")) {
-                                    am.setParameters("av_channel_exit=sys");
-                                    callMethod(mparam.thisObject, "startDVD", 1);
-                                    mToast.setText("DVD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc5");
-                                    setIntField(mparam.thisObject, "mtcappmode", 2);
-                                    return null;
-                                } else if (modearray.contains("music")) {
-                                    callMethod(mparam.thisObject, "startMusic", 1);
-                                    mToast.setText("Music");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to music from sys, mtc5");
-                                    setIntField(mparam.thisObject, "mtcappmode", 3);
-                                    return null;
-                                }
-                                // 6 - aux
-                            } else if (mtcappmode == 6) {
-                                if (modearray.contains("nav")) {
-                                    callMethod(mparam.thisObject, "startGPS");
-                                    mToast.setText("NAV");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc6");
-                                    setIntField(mparam.thisObject, "mtcappmode", 7);
-                                    return null;
-                                } else if (modearray.contains("radio")) {
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=fm");
-                                    am.setParameters("ctl_radio_mute=false");
-                                    callMethod(mparam.thisObject, "startRadio", 1);
-                                    mToast.setText("Radio");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc6");
-                                    setIntField(mparam.thisObject, "mtcappmode", 1);
-                                    return null;
-                                } else if (modearray.contains("dvd")) {
-                                    am.setParameters("av_channel_exit=sys");
-                                    callMethod(mparam.thisObject, "startDVD", 1);
-                                    mToast.setText("DVD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc6");
-                                    setIntField(mparam.thisObject, "mtcappmode", 2);
-                                    return null;
-                                } else if (modearray.contains("music")) {
-                                    callMethod(mparam.thisObject, "startMusic", 1);
-                                    mToast.setText("Music");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to music from sys, mtc6");
-                                    setIntField(mparam.thisObject, "mtcappmode", 3);
-                                    return null;
-                                } else if (modearray.contains("video")) {
-                                    callMethod(mparam.thisObject, "startMovie", 1);
-                                    mToast.setText("Video");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to video from sys, mtc6");
-                                    setIntField(mparam.thisObject, "mtcappmode", 4);
-                                    return null;
-                                } else if (modearray.contains("ipod")) {
-                                    callMethod(mparam.thisObject, "startIpod", 1);
-                                    mToast.setText("IPOD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to ipod from sys, mtc6");
-                                    setIntField(mparam.thisObject, "mtcappmode", 5);
-                                    return null;
-                                }
-
-                                // 7 - nav
-                            } else if (mtcappmode == 7) {
-                                if (modearray.contains("radio")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=fm");
-                                    am.setParameters("ctl_radio_mute=false");
-                                    callMethod(mparam.thisObject, "startRadio", 1);
-                                    mToast.setText("Radio");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc7");
-                                    setIntField(mparam.thisObject, "mtcappmode", 1);
-                                    return null;
-                                } else if (modearray.contains("dvd")) {
-                                    am.setParameters("av_channel_exit=sys");
-                                    callMethod(mparam.thisObject, "startDVD", 1);
-                                    mToast.setText("DVD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc7");
-                                    setIntField(mparam.thisObject, "mtcappmode", 2);
-                                    return null;
-                                } else if (modearray.contains("music")) {
-                                    callMethod(mparam.thisObject, "startMusic", 1);
-                                    mToast.setText("Music");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to music from sys, mtc7");
-                                    setIntField(mparam.thisObject, "mtcappmode", 3);
-                                    return null;
-                                } else if (modearray.contains("video")) {
-                                    callMethod(mparam.thisObject, "startMovie", 1);
-                                    mToast.setText("Video");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to video from sys, mtc7");
-                                    setIntField(mparam.thisObject, "mtcappmode", 4);
-                                    return null;
-                                } else if (modearray.contains("ipod")) {
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=ipod");
-                                    callMethod(mparam.thisObject, "startIpod", 1);
-                                    mToast.setText("IPOD");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to ipod from sys, mtc7");
-                                    setIntField(mparam.thisObject, "mtcappmode", 5);
-                                    return null;
-                                } else if (modearray.contains("aux")) {
-                                    if (isPoweramp && !isPaused) {
-                                        cmdPlayer(mCtx, "pause");
-                                    } else {
-                                        cmdPlayer(mCtx, "stop");
-                                    }
-                                    am.setParameters("av_channel_exit=sys");
-                                    am.setParameters("av_channel_enter=line");
-                                    callMethod(mparam.thisObject, "startAux", 1);
-                                    mToast.setText("AV IN/AUX");
-                                    mToast.setGravity(17, 0, -100);
-                                    mToast.show();
-                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc7");
-                                    setIntField(mparam.thisObject, "mtcappmode", 6);
-                                    return null;
-                                }
-                            }
-                        }
-
-                        // av channel is ipod
-                        if (s.equals("ipod")) {
-                            if (modearray.contains("aux")) {
-                                am.setParameters("av_channel_exit=ipod");
-                                am.setParameters("av_channel_enter=line");
-                                callMethod(mparam.thisObject, "startAux", 1);
-                                mToast.setText("AV IN/AUX");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to aux from ipod");
-                                setIntField(mparam.thisObject, "mtcappmode", 6);
-                                return null;
-                            } else if (modearray.contains("nav")) {
-                                am.setParameters("av_channel_exit=ipod");
-                                am.setParameters("av_channel_enter=sys");
-                                callMethod(mparam.thisObject, "startGPS");
-                                mToast.setText("Nav");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to nav from ipod");
-                                setIntField(mparam.thisObject, "mtcappmode", 7);
-                                return null;
-                            } else if (modearray.contains("radio")) {
-                                am.setParameters("av_channel_exit=ipod");
-                                am.setParameters("av_channel_enter=fm");
-                                am.setParameters("ctl_radio_mute=false");
-                                callMethod(mparam.thisObject, "startRadio", 1);
-                                mToast.setText("Radio");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to radio from ipod");
-                                setIntField(mparam.thisObject, "mtcappmode", 1);
-                                return null;
-                            } else if (modearray.contains("dvd")) {
-                                am.setParameters("av_channel_exit=ipod");
-                                callMethod(mparam.thisObject, "startDVD", 1);
-                                mToast.setText("DVD");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to dvd from ipod");
-                                setIntField(mparam.thisObject, "mtcappmode", 2);
-                                return null;
-                            } else if (modearray.contains("music")) {
-                                am.setParameters("av_channel_exit=ipod");
-                                am.setParameters("av_channel_enter=sys");
-                                callMethod(mparam.thisObject, "startMusic", 1);
-                                mToast.setText("Music");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to music from ipod");
-                                setIntField(mparam.thisObject, "mtcappmode", 3);
-                                return null;
-                            } else if (modearray.contains("video")) {
-                                am.setParameters("av_channel_exit=ipod");
-                                am.setParameters("av_channel_enter=sys");
-                                callMethod(mparam.thisObject, "startMovie", 1);
-                                mToast.setText("Video");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to video from ipod");
-                                setIntField(mparam.thisObject, "mtcappmode", 4);
-                                return null;
-                            }
-                        }
-
-                        // av channel is aux/line-in
-                        if (s.equals("line")) {
-                            if (modearray.contains("nav")) {
-                                am.setParameters("av_channel_exit=line");
-                                am.setParameters("av_channel_enter=sys");
-                                callMethod(mparam.thisObject, "startGPS");
-                                mToast.setText("Nav");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to nav from line");
-                                setIntField(mparam.thisObject, "mtcappmode", 7);
-                                return null;
-                            } else if (modearray.contains("radio")) {
-                                am.setParameters("av_channel_exit=line");
-                                am.setParameters("av_channel_enter=fm");
-                                am.setParameters("ctl_radio_mute=false");
-                                callMethod(mparam.thisObject, "startRadio", 1);
-                                mToast.setText("Radio");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to radio from line");
-                                setIntField(mparam.thisObject, "mtcappmode", 1);
-                                return null;
-                            } else if (modearray.contains("dvd")) {
-                                am.setParameters("av_channel_exit=line");
-                                am.setParameters("av_channel_enter=dvd");
-                                callMethod(mparam.thisObject, "startDVD", 1);
-                                mToast.setText("DVD");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to dvd from line");
-                                setIntField(mparam.thisObject, "mtcappmode", 2);
-                                return null;
-                            } else if (modearray.contains("music")) {
-                                am.setParameters("av_channel_exit=line");
-                                am.setParameters("av_channel_enter=sys");
-                                callMethod(mparam.thisObject, "startMusic", 1);
-                                mToast.setText("Music");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to music from line");
-                                setIntField(mparam.thisObject, "mtcappmode", 3);
-                                return null;
-                            } else if (modearray.contains("video")) {
-                                am.setParameters("av_channel_exit=line");
-                                am.setParameters("av_channel_enter=sys");
-                                callMethod(mparam.thisObject, "startMovie", 1);
-                                mToast.setText("Video");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to video from line");
-                                setIntField(mparam.thisObject, "mtcappmode", 4);
-                                return null;
-                            } else if (modearray.contains("ipod")) {
-                                am.setParameters("av_channel_exit=line");
-                                am.setParameters("av_channel_enter=ipod");
-                                callMethod(mparam.thisObject, "startIpod", 1);
-                                mToast.setText("IPOD");
-                                mToast.setGravity(17, 0, -100);
-                                mToast.show();
-                                if (DEBUG) log(TAG, "switch to ipod from line");
-                                setIntField(mparam.thisObject, "mtcappmode", 5);
-                                return null;
-                            }
-                        }
-
-                        // fall-thru is here
-                        if (DEBUG) log(TAG, "assign mtcappmode to 1 from fallthru");
-                        setIntField(mparam.thisObject, "mtcappmode", 1);
-                        return null;
-                    }
-                });
-            }
+//            if (prefs.getBoolean("modeswitch", false)) {
+//                findAndHookMethod(TARGET_CLASS, lpparam.classLoader, "ModeSwitch", new XC_MethodReplacement() {
+//                    @Override
+//                    protected Object replaceHookedMethod(MethodHookParam mparam) throws Throwable {
+//                        prefs.reload();
+//                        String s = am.getParameters("av_channel=");
+//                        String s1 = am.getParameters("cfg_dvd=");
+//                        Toast mToast = (Toast) getObjectField(mparam.thisObject, "mToast");
+//                        String ipod = am.getParameters("sta_ipod=");
+//                        Set<String> modearray = prefs.getStringSet("mode_key", null);
+//                        //						modearray.add("radio");
+//                        modearray.add("music");
+//                        int mtcappmode = getIntField(mparam.thisObject, "mtcappmode");
+//                        if (DEBUG) log(TAG, "mtcappmode is " + mtcappmode + ", current av_channel is " + s);
+//
+//                        // handle startup condition of mtcappmode = 0
+//                        if (s.equals("fm") && mtcappmode == 0) {
+//                            setIntField(mparam.thisObject, "mtcappmode", 1);
+//                            callMethod(mparam.thisObject, "ModeSwitch");
+//                        } else if (s.equals("sys") && mtcappmode == 0) {
+//                            setIntField(mparam.thisObject, "mtcappmode", 3);
+//                            callMethod(mparam.thisObject, "ModeSwitch");
+//                        } else if (s.equals("dvd") && mtcappmode == 0) {
+//                            setIntField(mparam.thisObject, "mtcappmode", 2);
+//                            callMethod(mparam.thisObject, "ModeSwitch");
+//                        }
+//
+//                        // radio output
+//                        if (s.equals("fm")) {
+//                            if (!s1.equals("0"))
+//                            {
+//                                if (modearray.contains("dvd")) {
+//                                    callMethod(mparam.thisObject, "startDVD", 1);
+//                                    mToast.setText("DVD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to dvd from fm");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                    return null;
+//                                } else if (modearray.contains("music")) {
+//                                    am.setParameters("ctl_radio_mute=true");
+//                                    am.setParameters("av_channel_exit=fm");
+//                                    am.setParameters("av_channel_enter=sys");
+//                                    Intent intent = new Intent("com.microntek.canbusdisplay");
+//                                    intent.putExtra("type", "off");
+//                                    mCtx.sendBroadcast(intent);
+//                                    callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
+//                                    mToast.setText("Music");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to music from fm");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                    return null;
+//                                }
+//                            }
+//                            setIntField(mparam.thisObject, "mtcappmode", 1);
+//                            return null;
+//                        }
+//
+//                        // dvd output
+//                        if (s.equals("dvd")) {
+//                            if (modearray.contains("music")) {
+//                                am.setParameters("av_channel_exit=dvd");
+//                                am.setParameters("av_channel_enter=sys");
+//                                Intent intent = new Intent("com.microntek.canbusdisplay");
+//                                intent.putExtra("type", "off");
+//                                mCtx.sendBroadcast(intent);
+//                                callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
+//                                mToast.setText("Music");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to music from dvd");
+//                                setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                return null;
+//                            }
+//                        }
+//
+//                        // android output
+//                        if (s.equals("sys")) {
+//                            // 1 - radio w/ sys output -- we should never hit here
+//                            if (mtcappmode == 1)
+//                            {
+//                                if (!s1.equals("0")) {
+//                                    if (modearray.contains("dvd")) {
+//                                        am.setParameters("av_channel_exit=sys");
+//                                        callMethod(mparam.thisObject, "startDVD", 1);
+//                                        mToast.setText("DVD");
+//                                        mToast.setGravity(17, 0, -100);
+//                                        mToast.show();
+//                                        if (DEBUG) log(TAG, "switch to dvd from sys, mtc1");
+//                                        setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                        return null;
+//                                    } else if (modearray.contains("music")) {
+//                                        callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
+//                                        mToast.setText("Music");
+//                                        mToast.setGravity(17, 0, -100);
+//                                        mToast.show();
+//                                        if (DEBUG) log(TAG, "switch to music from sys, mtc1");
+//                                        setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                        return null;
+//                                    }
+//                                }
+//                                setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                return null;
+//                                // 2 - dvd	-- shouldn't hit here either
+//                            } else if (mtcappmode == 2) {
+//                                if (modearray.contains("music")) {
+//                                    callMethod(mparam.thisObject, "startMusic", "mswitch", 1);
+//                                    mToast.setText("Music");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to music from sys, mtc2");
+//                                }
+//                                setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                return null;
+//                                // 3 - music
+//                            } else if (mtcappmode == 3) {
+//                                if (modearray.contains("video")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }
+//                                    callMethod(mparam.thisObject, "startMovie", 1);
+//                                    mToast.setText("Video");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to video from sys, mtc3");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 4);
+//                                    return null;
+//                                } else if (modearray.contains("ipod")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    callMethod(mparam.thisObject, "startIpod", 1);
+//                                    mToast.setText("IPOD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to ipod from sys, mtc3");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 5);
+//                                    return null;
+//                                } else if (modearray.contains("aux")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=line");
+//                                    callMethod(mparam.thisObject, "startAux", 1);
+//                                    mToast.setText("AV IN/AUX");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc3");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 6);
+//                                    return null;
+//                                } else if (modearray.contains("nav")) {
+//                                    callMethod(mparam.thisObject, "startGPS");
+//                                    mToast.setText("Nav");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc3");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 7);
+//                                    return null;
+//                                } else if (modearray.contains("dvd")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=dvd");
+//                                    callMethod(mparam.thisObject, "startDVD", 1);
+//                                    mToast.setText("DVD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc3");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                    return null;
+//                                } else if (modearray.contains("radio")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=fm");
+//                                    am.setParameters("ctl_radio_mute=false");
+//                                    Intent intent = new Intent("com.microntek.canbusdisplay");
+//                                    intent.putExtra("type", "off");
+//                                    mCtx.sendBroadcast(intent);
+//                                    callMethod(mparam.thisObject, "startRadio", 1);
+//                                    mToast.setText("Radio");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc3");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 1);
+//                                    return null;
+//                                }
+//                                // 4 - ipod
+//                            } else if (ipod.equals("true") && mtcappmode == 4) {
+//                                if (modearray.contains("ipod")) {
+//                                    callMethod(mparam.thisObject, "startIpod", 1);
+//                                    mToast.setText("IPOD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to ipod from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 5);
+//                                    return null;
+//                                } else if (modearray.contains("aux")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=line");
+//                                    callMethod(mparam.thisObject, "startAux", 1);
+//                                    mToast.setText("AV IN/AUX");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 6);
+//                                    return null;
+//                                } else if (modearray.contains("nav")) {
+//                                    callMethod(mparam.thisObject, "startGPS");
+//                                    mToast.setText("Nav");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 7);
+//                                    return null;
+//                                } else if (modearray.contains("radio")) {
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=fm");
+//                                    am.setParameters("ctl_radio_mute=false");
+//                                    callMethod(mparam.thisObject, "startRadio", 1);
+//                                    mToast.setText("Radio");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 1);
+//                                    return null;
+//                                } else if (modearray.contains("music")) {
+//                                    callMethod(mparam.thisObject, "startMusic", 1);
+//                                    mToast.setText("Music");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to music from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                    return null;
+//                                }
+//                                // 4 - video
+//                            } else if (mtcappmode == 4) {
+//                                if (modearray.contains("aux")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=line");
+//                                    callMethod(mparam.thisObject, "startAux", 1);
+//                                    mToast.setText("AV IN/AUX");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 6);
+//                                    return null;
+//                                } else if (modearray.contains("nav")) {
+//                                    callMethod(mparam.thisObject, "startGPS");
+//                                    mToast.setText("Nav");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 7);
+//                                    return null;
+//                                } else if (modearray.contains("radio")) {
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=fm");
+//                                    am.setParameters("ctl_radio_mute=false");
+//                                    callMethod(mparam.thisObject, "startRadio", 1);
+//                                    mToast.setText("Radio");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 1);
+//                                    return null;
+//                                } else if (modearray.contains("dvd")) {
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    callMethod(mparam.thisObject, "startDVD", 1);
+//                                    mToast.setText("DVD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                    return null;
+//                                } else if (modearray.contains("music")) {
+//                                    callMethod(mparam.thisObject, "startMusic", 1);
+//                                    mToast.setText("Music");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to music from sys, mtc4");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                    return null;
+//                                }
+//                                setIntField(mparam.thisObject, "mtcappmode", 5);
+//                                return null;
+//                                // 5 - ipod
+//                            } else if (mtcappmode == 5) {
+//                                if (modearray.contains("aux")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=line");
+//                                    callMethod(mparam.thisObject, "startAux", 1);
+//                                    mToast.setText("AV IN/AUX");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc5");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 6);
+//                                    return null;
+//                                } else if (modearray.contains("nav")) {
+//                                    callMethod(mparam.thisObject, "startGPS");
+//                                    mToast.setText("Nav");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc5");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 7);
+//                                    return null;
+//                                } else if (modearray.contains("radio")) {
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=fm");
+//                                    am.setParameters("ctl_radio_mute=false");
+//                                    callMethod(mparam.thisObject, "startRadio", 1);
+//                                    mToast.setText("Radio");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc5");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 1);
+//                                    return null;
+//                                } else if (modearray.contains("dvd")) {
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    callMethod(mparam.thisObject, "startDVD", 1);
+//                                    mToast.setText("DVD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc5");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                    return null;
+//                                } else if (modearray.contains("music")) {
+//                                    callMethod(mparam.thisObject, "startMusic", 1);
+//                                    mToast.setText("Music");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to music from sys, mtc5");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                    return null;
+//                                }
+//                                // 6 - aux
+//                            } else if (mtcappmode == 6) {
+//                                if (modearray.contains("nav")) {
+//                                    callMethod(mparam.thisObject, "startGPS");
+//                                    mToast.setText("NAV");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to nav from sys, mtc6");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 7);
+//                                    return null;
+//                                } else if (modearray.contains("radio")) {
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=fm");
+//                                    am.setParameters("ctl_radio_mute=false");
+//                                    callMethod(mparam.thisObject, "startRadio", 1);
+//                                    mToast.setText("Radio");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc6");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 1);
+//                                    return null;
+//                                } else if (modearray.contains("dvd")) {
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    callMethod(mparam.thisObject, "startDVD", 1);
+//                                    mToast.setText("DVD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc6");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                    return null;
+//                                } else if (modearray.contains("music")) {
+//                                    callMethod(mparam.thisObject, "startMusic", 1);
+//                                    mToast.setText("Music");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to music from sys, mtc6");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                    return null;
+//                                } else if (modearray.contains("video")) {
+//                                    callMethod(mparam.thisObject, "startMovie", 1);
+//                                    mToast.setText("Video");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to video from sys, mtc6");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 4);
+//                                    return null;
+//                                } else if (modearray.contains("ipod")) {
+//                                    callMethod(mparam.thisObject, "startIpod", 1);
+//                                    mToast.setText("IPOD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to ipod from sys, mtc6");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 5);
+//                                    return null;
+//                                }
+//
+//                                // 7 - nav
+//                            } else if (mtcappmode == 7) {
+//                                if (modearray.contains("radio")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=fm");
+//                                    am.setParameters("ctl_radio_mute=false");
+//                                    callMethod(mparam.thisObject, "startRadio", 1);
+//                                    mToast.setText("Radio");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to radio from sys, mtc7");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 1);
+//                                    return null;
+//                                } else if (modearray.contains("dvd")) {
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    callMethod(mparam.thisObject, "startDVD", 1);
+//                                    mToast.setText("DVD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to dvd from sys, mtc7");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                    return null;
+//                                } else if (modearray.contains("music")) {
+//                                    callMethod(mparam.thisObject, "startMusic", 1);
+//                                    mToast.setText("Music");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to music from sys, mtc7");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                    return null;
+//                                } else if (modearray.contains("video")) {
+//                                    callMethod(mparam.thisObject, "startMovie", 1);
+//                                    mToast.setText("Video");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to video from sys, mtc7");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 4);
+//                                    return null;
+//                                } else if (modearray.contains("ipod")) {
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=ipod");
+//                                    callMethod(mparam.thisObject, "startIpod", 1);
+//                                    mToast.setText("IPOD");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to ipod from sys, mtc7");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 5);
+//                                    return null;
+//                                } else if (modearray.contains("aux")) {
+//                                    if (isPoweramp && !isPaused) {
+//                                        cmdPlayer(mCtx, "pause");
+//                                    } else {
+//                                        cmdPlayer(mCtx, "stop");
+//                                    }
+//                                    am.setParameters("av_channel_exit=sys");
+//                                    am.setParameters("av_channel_enter=line");
+//                                    callMethod(mparam.thisObject, "startAux", 1);
+//                                    mToast.setText("AV IN/AUX");
+//                                    mToast.setGravity(17, 0, -100);
+//                                    mToast.show();
+//                                    if (DEBUG) log(TAG, "switch to aux from sys, mtc7");
+//                                    setIntField(mparam.thisObject, "mtcappmode", 6);
+//                                    return null;
+//                                }
+//                            }
+//                        }
+//
+//                        // av channel is ipod
+//                        if (s.equals("ipod")) {
+//                            if (modearray.contains("aux")) {
+//                                am.setParameters("av_channel_exit=ipod");
+//                                am.setParameters("av_channel_enter=line");
+//                                callMethod(mparam.thisObject, "startAux", 1);
+//                                mToast.setText("AV IN/AUX");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to aux from ipod");
+//                                setIntField(mparam.thisObject, "mtcappmode", 6);
+//                                return null;
+//                            } else if (modearray.contains("nav")) {
+//                                am.setParameters("av_channel_exit=ipod");
+//                                am.setParameters("av_channel_enter=sys");
+//                                callMethod(mparam.thisObject, "startGPS");
+//                                mToast.setText("Nav");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to nav from ipod");
+//                                setIntField(mparam.thisObject, "mtcappmode", 7);
+//                                return null;
+//                            } else if (modearray.contains("radio")) {
+//                                am.setParameters("av_channel_exit=ipod");
+//                                am.setParameters("av_channel_enter=fm");
+//                                am.setParameters("ctl_radio_mute=false");
+//                                callMethod(mparam.thisObject, "startRadio", 1);
+//                                mToast.setText("Radio");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to radio from ipod");
+//                                setIntField(mparam.thisObject, "mtcappmode", 1);
+//                                return null;
+//                            } else if (modearray.contains("dvd")) {
+//                                am.setParameters("av_channel_exit=ipod");
+//                                callMethod(mparam.thisObject, "startDVD", 1);
+//                                mToast.setText("DVD");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to dvd from ipod");
+//                                setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                return null;
+//                            } else if (modearray.contains("music")) {
+//                                am.setParameters("av_channel_exit=ipod");
+//                                am.setParameters("av_channel_enter=sys");
+//                                callMethod(mparam.thisObject, "startMusic", 1);
+//                                mToast.setText("Music");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to music from ipod");
+//                                setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                return null;
+//                            } else if (modearray.contains("video")) {
+//                                am.setParameters("av_channel_exit=ipod");
+//                                am.setParameters("av_channel_enter=sys");
+//                                callMethod(mparam.thisObject, "startMovie", 1);
+//                                mToast.setText("Video");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to video from ipod");
+//                                setIntField(mparam.thisObject, "mtcappmode", 4);
+//                                return null;
+//                            }
+//                        }
+//
+//                        // av channel is aux/line-in
+//                        if (s.equals("line")) {
+//                            if (modearray.contains("nav")) {
+//                                am.setParameters("av_channel_exit=line");
+//                                am.setParameters("av_channel_enter=sys");
+//                                callMethod(mparam.thisObject, "startGPS");
+//                                mToast.setText("Nav");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to nav from line");
+//                                setIntField(mparam.thisObject, "mtcappmode", 7);
+//                                return null;
+//                            } else if (modearray.contains("radio")) {
+//                                am.setParameters("av_channel_exit=line");
+//                                am.setParameters("av_channel_enter=fm");
+//                                am.setParameters("ctl_radio_mute=false");
+//                                callMethod(mparam.thisObject, "startRadio", 1);
+//                                mToast.setText("Radio");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to radio from line");
+//                                setIntField(mparam.thisObject, "mtcappmode", 1);
+//                                return null;
+//                            } else if (modearray.contains("dvd")) {
+//                                am.setParameters("av_channel_exit=line");
+//                                am.setParameters("av_channel_enter=dvd");
+//                                callMethod(mparam.thisObject, "startDVD", 1);
+//                                mToast.setText("DVD");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to dvd from line");
+//                                setIntField(mparam.thisObject, "mtcappmode", 2);
+//                                return null;
+//                            } else if (modearray.contains("music")) {
+//                                am.setParameters("av_channel_exit=line");
+//                                am.setParameters("av_channel_enter=sys");
+//                                callMethod(mparam.thisObject, "startMusic", 1);
+//                                mToast.setText("Music");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to music from line");
+//                                setIntField(mparam.thisObject, "mtcappmode", 3);
+//                                return null;
+//                            } else if (modearray.contains("video")) {
+//                                am.setParameters("av_channel_exit=line");
+//                                am.setParameters("av_channel_enter=sys");
+//                                callMethod(mparam.thisObject, "startMovie", 1);
+//                                mToast.setText("Video");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to video from line");
+//                                setIntField(mparam.thisObject, "mtcappmode", 4);
+//                                return null;
+//                            } else if (modearray.contains("ipod")) {
+//                                am.setParameters("av_channel_exit=line");
+//                                am.setParameters("av_channel_enter=ipod");
+//                                callMethod(mparam.thisObject, "startIpod", 1);
+//                                mToast.setText("IPOD");
+//                                mToast.setGravity(17, 0, -100);
+//                                mToast.show();
+//                                if (DEBUG) log(TAG, "switch to ipod from line");
+//                                setIntField(mparam.thisObject, "mtcappmode", 5);
+//                                return null;
+//                            }
+//                        }
+//
+//                        // fall-thru is here
+//                        if (DEBUG) log(TAG, "assign mtcappmode to 1 from fallthru");
+//                        setIntField(mparam.thisObject, "mtcappmode", 1);
+//                        return null;
+//                    }
+//                });
+//            }
         } else if (lpparam.packageName.equals(radiopkg)) {
             prefs.reload();
             if (prefs.getBoolean("resetswitch", false)) {
